@@ -1,0 +1,2 @@
+# attendance-web
+A web-based QR and geofencing attendance system for Jerusalem College of Engineering, Pallikaranai.  Students enter their name once and mark attendance using a single button on subsequent visits.  Attendance is validated within a 150-meter radius of the college campus.  Records are stored in AWS DynamoDB and logged in daily Excel sheets on S3.  Built with HTML, JavaScript, and AWS Lambda for a simple, mobile-friendly interface.
