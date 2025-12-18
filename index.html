@@ -2,30 +2,24 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Attendance System</title>
-    <script src="attendance.js" defer></script>
-    <style>
-        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
-        input, button { padding: 10px; margin: 5px; font-size: 16px; }
-        #status-message { margin-top: 20px; font-weight: bold; }
-    </style>
+    <title>Jerusalem Attendance System</title>
 </head>
 <body>
+    <h2 id="welcome">Welcome <span id="student-name-display"></span>!</h2>
 
-    <!-- First-time user: enter name -->
+    <!-- Name entry form -->
     <div id="name-form">
-        <h2>Enter your name to start:</h2>
-        <input type="text" id="student-name-input" placeholder="Your Name">
+        <input type="text" id="student-name-input" placeholder="Enter your name">
         <button id="enter-name-btn">Enter</button>
     </div>
 
     <!-- Attendance section -->
     <div id="attendance-section" style="display:none;">
-        <h2>Welcome <span id="student-name-display"></span>!</h2>
-        <p>Current Time: <span id="time"></span></p>
+        <p>Current time: <span id="time"></span></p>
         <button id="mark-attendance-btn">Mark Attendance</button>
         <p id="status-message"></p>
     </div>
 
+    <script src="attendance.js" defer></script>
 </body>
 </html>

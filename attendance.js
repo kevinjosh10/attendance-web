@@ -1,105 +1,69 @@
-// Replace this with your actual API Gateway URL (case-sensitive)
-const API_URL = "https://dhtdt05ncj.execute-api.ap-south-1.amazonaws.com/prod/attendance";
+document.addEventListener("DOMContentLoaded", () => {
+    const nameForm = document.getElementById("name-form");
+    const attendanceSection = document.getElementById("attendance-section");
+    const enterNameBtn = document.getElementById("enter-name-btn");
+    const studentNameInput = document.getElementById("student-name-input");
+    const studentNameDisplay = document.getElementById("student-name-display");
+    const markBtn = document.getElementById("mark-attendance-btn");
+    const timeDisplay = document.getElementById("time");
+    const statusMessage = document.getElementById("status-message");
 
-// Generate or retrieve a unique device ID for this browser
-function getDeviceID() {
-    let deviceID = localStorage.getItem('deviceID');
-    if (!deviceID) {
-        deviceID = 'device-' + Math.random().toString(36).substring(2, 15);
-        localStorage.setItem('deviceID', deviceID);
-    }
-    return deviceID;
-}
+    // Check if name is stored
+    let studentName = localStorage.getItem("studentName");
 
-// Show current time on the page
-function showTime() {
-    const timeElement = document.getElementById('time');
-    if (!timeElement) return;
-    setInterval(() => {
-        const now = new Date();
-        timeElement.textContent = now.toLocaleTimeString();
-    }, 1000);
-}
-
-// Initialize page
-function init() {
-    showTime();
-
-    const studentName = localStorage.getItem('studentName');
-    const nameForm = document.getElementById('name-form');
-    const attendanceSection = document.getElementById('attendance-section');
-
-    // First-time user: show name form
-    if (!studentName) {
-        nameForm.style.display = 'block';
-        attendanceSection.style.display = 'none';
-
-        document.getElementById('enter-name-btn').addEventListener('click', () => {
-            const nameInput = document.getElementById('student-name-input').value.trim();
-            if (nameInput === "") {
-                alert("Please enter your name");
-                return;
-            }
-            localStorage.setItem('studentName', nameInput);
-            nameForm.style.display = 'none';
-            attendanceSection.style.display = 'block';
-        });
-
-    } else {
-        // Returning user: skip name entry
-        nameForm.style.display = 'none';
-        attendanceSection.style.display = 'block';
+    if (studentName) {
+        nameForm.style.display = "none";
+        attendanceSection.style.display = "block";
+        studentNameDisplay.textContent = studentName;
+        updateTime();
     }
 
-    // Mark Attendance button click
-    document.getElementById('mark-attendance-btn').addEventListener('click', () => {
-        const studentName = localStorage.getItem('studentName');
-        const deviceID = getDeviceID();
-
-        if (!navigator.geolocation) {
-            alert("Geolocation is not supported by your browser");
+    enterNameBtn.addEventListener("click", () => {
+        const name = studentNameInput.value.trim();
+        if (!name) {
+            alert("Please enter your name.");
             return;
         }
-
-        navigator.geolocation.getCurrentPosition(
-            (position) => {
-                const latitude = position.coords.latitude;
-                const longitude = position.coords.longitude;
-
-                const payload = {
-                    StudentName: studentName,
-                    DeviceID: deviceID,
-                    Latitude: latitude,
-                    Longitude: longitude
-                };
-
-                fetch(API_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(payload)
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.statusCode === 200) {
-                        alert("✅ Attendance marked successfully!");
-                    } else {
-                        alert("❌ " + data.body);
-                    }
-                })
-                .catch(err => {
-                    console.error(err);
-                    alert("Error marking attendance. Check console.");
-                });
-            },
-            (error) => {
-                alert("Location access is required to mark attendance.");
-            },
-            { enableHighAccuracy: true }
-        );
+        studentName = name;
+        localStorage.setItem("studentName", studentName);
+        nameForm.style.display = "none";
+        attendanceSection.style.display = "block";
+        studentNameDisplay.textContent = studentName;
+        updateTime();
     });
-}
 
-// Run the init function after page load
-window.onload = init;
+    // Update time every second
+    function updateTime() {
+        timeDisplay.textContent = new Date().toLocaleTimeString();
+        setTimeout(updateTime, 1000);
+    }
+
+    markBtn.addEventListener("click", () => {
+        if (!navigator.geolocation) {
+            statusMessage.textContent = "Geolocation is not supported by your browser.";
+            return;
+        }
+        navigator.geolocation.getCurrentPosition(async (position) => {
+            const latitude = position.coords.latitude;
+            const longitude = position.coords.longitude;
+
+            // Example POST request to your Lambda API
+            try {
+                const response = await fetch("https://dhtdt05ncj.execute-api.ap-south-1.amazonaws.com/prod/attendance", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        DeviceID: "DEVICE-" + studentName.replace(/\s+/g, ""), // simple device ID
+                        StudentName: studentName,
+                        Latitude: latitude,
+                        Longitude: longitude
+                    })
+                });
+                const result = await response.text();
+                statusMessage.textContent = result;
+            } catch (err) {
+                statusMessage.textContent = "Error marking attendance: " + err;
+            }
+        });
+    });
+});
