@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Attendance</title>
+    <style>
+        body { font-family: Arial; padding: 20px; text-align: center; }
+        #nameForm, #attendanceSection { margin-top: 50px; }
+        button { padding: 10px 20px; font-size: 16px; }
+    </style>
+</head>
+<body>
+    <h1>Jerusalem College Attendance</h1>
+
+    <!-- First-time name input -->
+    <div id="nameForm">
+        <p>Enter your name to start:</p>
+        <input type="text" id="studentName" placeholder="Your Name">
+        <button onclick="saveName()">Submit</button>
+    </div>
+
+    <!-- Attendance section -->
+    <div id="attendanceSection" style="display:none;">
+        <p>Hello, <span id="displayName"></span></p>
+        <p>Current Time: <span id="currentTime"></span></p>
+        <button onclick="markAttendance()">Mark Attendance</button>
+        <p id="responseMessage"></p>
+    </div>
+
+    <script src="attendance.js"></script>
+</body>
+</html>
