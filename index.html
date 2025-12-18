@@ -2,51 +2,30 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Attendance System</title>
+    <script src="attendance.js" defer></script>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            padding: 20px;
-            text-align: center;
-        }
-        #attendance-section {
-            display: none;
-            margin-top: 20px;
-        }
-        button {
-            padding: 10px 20px;
-            font-size: 16px;
-            cursor: pointer;
-        }
-        input {
-            padding: 8px;
-            font-size: 16px;
-        }
-        #time {
-            margin-top: 10px;
-            font-weight: bold;
-        }
+        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
+        input, button { padding: 10px; margin: 5px; font-size: 16px; }
+        #status-message { margin-top: 20px; font-weight: bold; }
     </style>
 </head>
 <body>
-    <h1>Attendance System</h1>
 
-    <!-- Name input form -->
+    <!-- First-time user: enter name -->
     <div id="name-form">
-        <p>Enter your name to start:</p>
+        <h2>Enter your name to start:</h2>
         <input type="text" id="student-name-input" placeholder="Your Name">
         <button id="enter-name-btn">Enter</button>
     </div>
 
     <!-- Attendance section -->
-    <div id="attendance-section">
-        <p>Welcome, <span id="student-name-display"></span>!</p>
+    <div id="attendance-section" style="display:none;">
+        <h2>Welcome <span id="student-name-display"></span>!</h2>
+        <p>Current Time: <span id="time"></span></p>
         <button id="mark-attendance-btn">Mark Attendance</button>
-        <p id="time"></p>
-        <p id="status-message" style="color: red;"></p>
+        <p id="status-message"></p>
     </div>
 
-    <script src="attendance.js"></script>
 </body>
 </html>
