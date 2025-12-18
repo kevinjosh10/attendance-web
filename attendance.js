@@ -1,69 +1,93 @@
-document.addEventListener("DOMContentLoaded", () => {
-    const nameForm = document.getElementById("name-form");
-    const attendanceSection = document.getElementById("attendance-section");
-    const enterNameBtn = document.getElementById("enter-name-btn");
-    const studentNameInput = document.getElementById("student-name-input");
-    const studentNameDisplay = document.getElementById("student-name-display");
-    const markBtn = document.getElementById("mark-attendance-btn");
-    const timeDisplay = document.getElementById("time");
-    const statusMessage = document.getElementById("status-message");
+// ================= CONFIG =================
+const API_URL =
+  "https://dhtdt05ncj.execute-api.ap-south-1.amazonaws.com/prod1/attendance";
 
-    // Check if name is stored
-    let studentName = localStorage.getItem("studentName");
+// ================= ELEMENTS =================
+const nameSection = document.getElementById("nameSection");
+const attendanceSection = document.getElementById("attendanceSection");
+const nameInput = document.getElementById("studentName");
+const welcomeText = document.getElementById("welcomeText");
+const timeText = document.getElementById("timeText");
 
-    if (studentName) {
-        nameForm.style.display = "none";
-        attendanceSection.style.display = "block";
-        studentNameDisplay.textContent = studentName;
-        updateTime();
-    }
+// ================= ON LOAD =================
+window.onload = () => {
+  const savedName = localStorage.getItem("studentName");
 
-    enterNameBtn.addEventListener("click", () => {
-        const name = studentNameInput.value.trim();
-        if (!name) {
-            alert("Please enter your name.");
-            return;
-        }
-        studentName = name;
-        localStorage.setItem("studentName", studentName);
-        nameForm.style.display = "none";
-        attendanceSection.style.display = "block";
-        studentNameDisplay.textContent = studentName;
-        updateTime();
-    });
+  if (savedName) {
+    showAttendancePage(savedName);
+  } else {
+    nameSection.style.display = "block";
+    attendanceSection.style.display = "none";
+  }
 
-    // Update time every second
-    function updateTime() {
-        timeDisplay.textContent = new Date().toLocaleTimeString();
-        setTimeout(updateTime, 1000);
-    }
+  updateTime();
+  setInterval(updateTime, 1000);
+};
 
-    markBtn.addEventListener("click", () => {
-        if (!navigator.geolocation) {
-            statusMessage.textContent = "Geolocation is not supported by your browser.";
-            return;
-        }
-        navigator.geolocation.getCurrentPosition(async (position) => {
-            const latitude = position.coords.latitude;
-            const longitude = position.coords.longitude;
+// ================= SAVE NAME =================
+function saveName() {
+  const name = nameInput.value.trim();
 
-            // Example POST request to your Lambda API
-            try {
-                const response = await fetch("https://dhtdt05ncj.execute-api.ap-south-1.amazonaws.com/prod/attendance", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        DeviceID: "DEVICE-" + studentName.replace(/\s+/g, ""), // simple device ID
-                        StudentName: studentName,
-                        Latitude: latitude,
-                        Longitude: longitude
-                    })
-                });
-                const result = await response.text();
-                statusMessage.textContent = result;
-            } catch (err) {
-                statusMessage.textContent = "Error marking attendance: " + err;
-            }
+  if (!name) {
+    alert("Please enter your name");
+    return;
+  }
+
+  localStorage.setItem("studentName", name);
+  showAttendancePage(name);
+}
+
+// ================= SHOW ATTENDANCE PAGE =================
+function showAttendancePage(name) {
+  nameSection.style.display = "none";
+  attendanceSection.style.display = "block";
+  welcomeText.innerText = `Welcome ${name}`;
+}
+
+// ================= UPDATE TIME =================
+function updateTime() {
+  const now = new Date();
+  timeText.innerText = `Time: ${now.toLocaleTimeString()}`;
+}
+
+// ================= MARK ATTENDANCE =================
+function markAttendance() {
+  if (!navigator.geolocation) {
+    alert("Geolocation is not supported by your browser");
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(
+    async (position) => {
+      const payload = {
+        studentName: localStorage.getItem("studentName"),
+        latitude: position.coords.latitude,
+        longitude: position.coords.longitude,
+      };
+
+      try {
+        const response = await fetch(API_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
         });
-    });
-});
+
+        const result = await response.json();
+
+        if (response.ok) {
+          alert(result.message || "Attendance marked successfully");
+        } else {
+          alert(result.message || "Attendance failed");
+        }
+      } catch (error) {
+        console.error(error);
+        alert("Error connecting to server");
+      }
+    },
+    () => {
+      alert("Location permission denied");
+    }
+  );
+}

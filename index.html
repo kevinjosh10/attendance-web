@@ -1,25 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Jerusalem Attendance System</title>
+  <meta charset="UTF-8" />
+  <title>Jerusalem Attendance System</title>
 </head>
 <body>
-    <h2 id="welcome">Welcome <span id="student-name-display"></span>!</h2>
 
-    <!-- Name entry form -->
-    <div id="name-form">
-        <input type="text" id="student-name-input" placeholder="Enter your name">
-        <button id="enter-name-btn">Enter</button>
-    </div>
+  <!-- NAME SECTION -->
+  <div id="nameSection">
+    <h2>Enter your name</h2>
+    <input type="text" id="studentName" placeholder="Enter your name" />
+    <button onclick="saveName()">Enter</button>
+  </div>
 
-    <!-- Attendance section -->
-    <div id="attendance-section" style="display:none;">
-        <p>Current time: <span id="time"></span></p>
-        <button id="mark-attendance-btn">Mark Attendance</button>
-        <p id="status-message"></p>
-    </div>
+  <!-- ATTENDANCE SECTION -->
+  <div id="attendanceSection" style="display:none;">
+    <h2 id="welcomeText"></h2>
+    <p id="timeText"></p>
+    <button onclick="markAttendance()">Mark Attendance</button>
+  </div>
 
-    <script src="attendance.js" defer></script>
+  <script src="attendance.js"></script>
 </body>
 </html>
