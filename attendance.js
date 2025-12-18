@@ -1,93 +1,75 @@
-// ================= CONFIG =================
-const API_URL =
-  "https://dhtdt05ncj.execute-api.ap-south-1.amazonaws.com/prod1/attendance";
+const API_URL = "https://dhtdt05ncj.execute-api.ap-south-1.amazonaws.com/prod1/attendance";
 
-// ================= ELEMENTS =================
+// Get saved name
+const savedName = localStorage.getItem("studentName");
+
 const nameSection = document.getElementById("nameSection");
 const attendanceSection = document.getElementById("attendanceSection");
-const nameInput = document.getElementById("studentName");
 const welcomeText = document.getElementById("welcomeText");
 const timeText = document.getElementById("timeText");
 
-// ================= ON LOAD =================
-window.onload = () => {
-  const savedName = localStorage.getItem("studentName");
-
-  if (savedName) {
-    showAttendancePage(savedName);
-  } else {
-    nameSection.style.display = "block";
-    attendanceSection.style.display = "none";
-  }
-
-  updateTime();
-  setInterval(updateTime, 1000);
-};
-
-// ================= SAVE NAME =================
-function saveName() {
-  const name = nameInput.value.trim();
-
-  if (!name) {
-    alert("Please enter your name");
-    return;
-  }
-
-  localStorage.setItem("studentName", name);
-  showAttendancePage(name);
+if (savedName) {
+  showAttendance(savedName);
 }
 
-// ================= SHOW ATTENDANCE PAGE =================
-function showAttendancePage(name) {
+// Save name first time
+function saveName() {
+  const name = document.getElementById("studentName").value.trim();
+  if (!name) {
+    alert("Enter your name");
+    return;
+  }
+  localStorage.setItem("studentName", name);
+  showAttendance(name);
+}
+
+function showAttendance(name) {
   nameSection.style.display = "none";
   attendanceSection.style.display = "block";
   welcomeText.innerText = `Welcome ${name}`;
+  updateTime();
+  setInterval(updateTime, 1000);
 }
 
-// ================= UPDATE TIME =================
 function updateTime() {
   const now = new Date();
-  timeText.innerText = `Time: ${now.toLocaleTimeString()}`;
+  timeText.innerText = "Current time: " + now.toLocaleTimeString();
 }
 
-// ================= MARK ATTENDANCE =================
+// Mark attendance
 function markAttendance() {
   if (!navigator.geolocation) {
-    alert("Geolocation is not supported by your browser");
+    alert("Geolocation not supported");
     return;
   }
 
   navigator.geolocation.getCurrentPosition(
-    async (position) => {
-      const payload = {
-        studentName: localStorage.getItem("studentName"),
-        latitude: position.coords.latitude,
-        longitude: position.coords.longitude,
-      };
-
-      try {
-        const response = await fetch(API_URL, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(payload),
-        });
-
-        const result = await response.json();
-
-        if (response.ok) {
-          alert(result.message || "Attendance marked successfully");
-        } else {
-          alert(result.message || "Attendance failed");
-        }
-      } catch (error) {
-        console.error(error);
-        alert("Error connecting to server");
-      }
+    (position) => {
+      sendAttendance(position.coords.latitude, position.coords.longitude);
     },
     () => {
       alert("Location permission denied");
     }
   );
+}
+
+function sendAttendance(lat, lon) {
+  const payload = {
+    DeviceID: navigator.userAgent,
+    StudentName: localStorage.getItem("studentName"),
+    Latitude: lat,
+    Longitude: lon
+  };
+
+  fetch(API_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  })
+    .then(res => res.text())
+    .then(data => alert(data))
+    .catch(err => {
+      console.error(err);
+      alert("Error connecting to the server");
+    });
 }
