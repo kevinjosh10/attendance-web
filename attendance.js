@@ -1,84 +1,94 @@
 document.addEventListener("DOMContentLoaded", () => {
-
-    const API_URL = "https://dhtdt05ncj.execute-api.ap-south-1.amazonaws.com/prod1/attendance";
-
     const nameForm = document.getElementById("name-form");
-    const nameInput = document.getElementById("student-name-input");
-    const enterBtn = document.getElementById("enter-name-btn");
+    const studentNameInput = document.getElementById("student-name-input");
+    const enterNameBtn = document.getElementById("enter-name-btn");
 
     const attendanceSection = document.getElementById("attendance-section");
-    const welcomeText = document.getElementById("student-name-display");
-    const timeSpan = document.getElementById("time");
-    const markBtn = document.getElementById("mark-attendance-btn");
-    const statusMsg = document.getElementById("status-message");
+    const markAttendanceBtn = document.getElementById("mark-attendance-btn");
+    const statusMessage = document.getElementById("status-message");
+    const studentNameDisplay = document.getElementById("student-name-display");
+    const timeDisplay = document.getElementById("time");
 
-    // Device ID
-    function getDeviceId() {
-        let id = localStorage.getItem("deviceId");
-        if (!id) {
-            id = "dev-" + Math.random().toString(36).slice(2);
-            localStorage.setItem("deviceId", id);
-        }
-        return id;
+    const apiUrl = "https://dhtdt05ncj.execute-api.ap-south-1.amazonaws.com/prod1/attendance";
+
+    let studentName = localStorage.getItem("studentName");
+    let deviceId = localStorage.getItem("deviceId") || generateDeviceId();
+
+    if (studentName) {
+        showAttendanceSection(studentName);
+    } else {
+        nameForm.style.display = "block";
     }
 
-    // Time
-    function updateTime() {
-        timeSpan.textContent = new Date().toLocaleTimeString();
-    }
-    updateTime();
-    setInterval(updateTime, 1000);
-
-    // Page load
-    const savedName = localStorage.getItem("studentName");
-    if (savedName) {
-        welcomeText.textContent = savedName;
-        nameForm.style.display = "none";
-        attendanceSection.style.display = "block";
-    }
-
-    // Enter name
-    enterBtn.addEventListener("click", () => {
-        const name = nameInput.value.trim();
+    enterNameBtn.addEventListener("click", () => {
+        const name = studentNameInput.value.trim();
         if (!name) {
             alert("Please enter your name");
             return;
         }
-        localStorage.setItem("studentName", name);
-        welcomeText.textContent = name;
-        nameForm.style.display = "none";
-        attendanceSection.style.display = "block";
+        studentName = name;
+        localStorage.setItem("studentName", studentName);
+        showAttendanceSection(studentName);
     });
 
-    nameInput.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") enterBtn.click();
-    });
+    markAttendanceBtn.addEventListener("click", () => {
+        if (!navigator.geolocation) {
+            alert("Geolocation not supported by your browser");
+            return;
+        }
 
-    // Mark attendance
-    markBtn.addEventListener("click", () => {
-        statusMsg.textContent = "Getting location...";
+        statusMessage.textContent = "Getting location...";
+
         navigator.geolocation.getCurrentPosition(
-            async (pos) => {
+            async (position) => {
+                const latitude = position.coords.latitude;
+                const longitude = position.coords.longitude;
                 const payload = {
-                    DeviceID: getDeviceId(),
-                    StudentName: localStorage.getItem("studentName"),
-                    Latitude: pos.coords.latitude,
-                    Longitude: pos.coords.longitude
+                    DeviceID: deviceId,
+                    StudentName: studentName,
+                    Latitude: latitude,
+                    Longitude: longitude
                 };
+
                 try {
-                    const res = await fetch(API_URL, {
+                    const response = await fetch(apiUrl, {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify(payload)
                     });
-                    const text = await res.text();
-                    statusMsg.textContent = text;
-                } catch {
-                    statusMsg.textContent = "Error connecting to server";
+
+                    if (!response.ok) {
+                        const text = await response.text();
+                        statusMessage.textContent = `Error: ${text}`;
+                        return;
+                    }
+
+                    const text = await response.text();
+                    statusMessage.textContent = text;
+                    timeDisplay.textContent = new Date().toLocaleTimeString();
+                } catch (err) {
+                    statusMessage.textContent = "Error connecting to server";
+                    console.error(err);
                 }
             },
-            () => { statusMsg.textContent = "Location permission denied"; }
+            (error) => {
+                statusMessage.textContent = "Error getting location";
+                console.error(error);
+            },
+            { enableHighAccuracy: true }
         );
     });
 
+    function showAttendanceSection(name) {
+        nameForm.style.display = "none";
+        attendanceSection.style.display = "block";
+        studentNameDisplay.textContent = name;
+        timeDisplay.textContent = new Date().toLocaleTimeString();
+    }
+
+    function generateDeviceId() {
+        const id = 'device-' + Math.random().toString(36).substr(2, 9);
+        localStorage.setItem("deviceId", id);
+        return id;
+    }
 });
