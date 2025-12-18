@@ -2,29 +2,49 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Attendance</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance System</title>
     <style>
-        body { font-family: Arial; padding: 20px; text-align: center; }
-        #nameForm, #attendanceSection { margin-top: 50px; }
-        button { padding: 10px 20px; font-size: 16px; }
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            text-align: center;
+        }
+        #attendance-section {
+            display: none;
+            margin-top: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        input {
+            padding: 8px;
+            font-size: 16px;
+        }
+        #time {
+            margin-top: 10px;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
-    <h1>Jerusalem College Attendance</h1>
+    <h1>Attendance System</h1>
 
-    <!-- First-time name input -->
-    <div id="nameForm">
+    <!-- Name input form -->
+    <div id="name-form">
         <p>Enter your name to start:</p>
-        <input type="text" id="studentName" placeholder="Your Name">
-        <button onclick="saveName()">Submit</button>
+        <input type="text" id="student-name-input" placeholder="Your Name">
+        <button id="enter-name-btn">Enter</button>
     </div>
 
     <!-- Attendance section -->
-    <div id="attendanceSection" style="display:none;">
-        <p>Hello, <span id="displayName"></span></p>
-        <p>Current Time: <span id="currentTime"></span></p>
-        <button onclick="markAttendance()">Mark Attendance</button>
-        <p id="responseMessage"></p>
+    <div id="attendance-section">
+        <p>Welcome, <span id="student-name-display"></span>!</p>
+        <button id="mark-attendance-btn">Mark Attendance</button>
+        <p id="time"></p>
+        <p id="status-message" style="color: red;"></p>
     </div>
 
     <script src="attendance.js"></script>
