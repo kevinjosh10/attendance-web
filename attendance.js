@@ -1,21 +1,20 @@
-const apiUrl = 'https://dhtdt05ncj.execute-api.ap-south-1.amazonaws.com/prod1/attendance';
-
 const nameForm = document.getElementById('name-form');
 const studentNameInput = document.getElementById('student-name-input');
 const enterNameBtn = document.getElementById('enter-name-btn');
+
 const attendanceSection = document.getElementById('attendance-section');
 const markAttendanceBtn = document.getElementById('mark-attendance-btn');
-const timeDisplay = document.getElementById('time');
 const statusMessage = document.getElementById('status-message');
-const welcomeDisplay = document.getElementById('student-name-display');
+const studentNameDisplay = document.getElementById('student-name-display');
+const timeDisplay = document.getElementById('time');
 
-let deviceID = localStorage.getItem('deviceID');
-let studentName = localStorage.getItem('studentName');
+let studentName = localStorage.getItem('studentName') || null;
 
-// Generate random deviceID if not exists
-if (!deviceID) {
-    deviceID = 'device-' + Math.random().toString(36).substr(2, 9);
-    localStorage.setItem('deviceID', deviceID);
+// Show attendance section if name is already stored
+if (studentName) {
+    nameForm.style.display = 'none';
+    attendanceSection.style.display = 'block';
+    studentNameDisplay.textContent = studentName;
 }
 
 // Update time every second
@@ -23,13 +22,6 @@ setInterval(() => {
     const now = new Date();
     timeDisplay.textContent = now.toLocaleTimeString();
 }, 1000);
-
-// If studentName exists, skip name entry
-if (studentName) {
-    nameForm.style.display = 'none';
-    attendanceSection.style.display = 'block';
-    welcomeDisplay.textContent = studentName;
-}
 
 // Handle first-time name entry
 enterNameBtn.addEventListener('click', () => {
@@ -40,56 +32,48 @@ enterNameBtn.addEventListener('click', () => {
     }
     studentName = name;
     localStorage.setItem('studentName', studentName);
-    welcomeDisplay.textContent = studentName;
+    studentNameDisplay.textContent = studentName;
     nameForm.style.display = 'none';
     attendanceSection.style.display = 'block';
 });
 
-// Handle attendance marking
+// Mark attendance
 markAttendanceBtn.addEventListener('click', () => {
     statusMessage.textContent = 'Getting location...';
-
     if (!navigator.geolocation) {
-        statusMessage.textContent = 'Geolocation not supported by your browser';
+        statusMessage.textContent = 'Geolocation not supported.';
         return;
     }
 
-    navigator.geolocation.getCurrentPosition(
-        async (position) => {
-            const latitude = position.coords.latitude;
-            const longitude = position.coords.longitude;
+    navigator.geolocation.getCurrentPosition(async (position) => {
+        const lat = position.coords.latitude;
+        const lon = position.coords.longitude;
 
-            try {
-                const response = await fetch(apiUrl, {
+        try {
+            const response = await fetch(
+                'https://dhtdt05ncj.execute-api.ap-south-1.amazonaws.com/prod1/attendance',
+                {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        DeviceID: deviceID,
-                        StudentName: studentName,
-                        Latitude: latitude,
-                        Longitude: longitude
+                        DeviceID: navigator.userAgent,
+                        Latitude: lat,
+                        Longitude: lon,
+                        StudentName: studentName
                     })
-                });
-
-                const text = await response.text();
-
-                if (response.ok) {
-                    statusMessage.textContent = text;
-                } else {
-                    statusMessage.textContent = `Error: ${text}`;
                 }
+            );
 
-            } catch (error) {
-                statusMessage.textContent = 'Error connecting to server';
-                console.error(error);
+            const text = await response.text();
+            if (response.ok) {
+                statusMessage.textContent = text;
+            } else {
+                statusMessage.textContent = `Error: ${text}`;
             }
-        },
-        (error) => {
-            statusMessage.textContent = 'Unable to retrieve your location';
-            console.error(error);
-        },
-        { enableHighAccuracy: true, timeout: 10000 }
-    );
+        } catch (err) {
+            statusMessage.textContent = 'Error connecting to server';
+        }
+    }, (err) => {
+        statusMessage.textContent = 'Error getting location';
+    });
 });
