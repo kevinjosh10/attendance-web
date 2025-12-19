@@ -1,79 +1,100 @@
+const API_URL = 'https://dhtdt05ncj.execute-api.ap-south-1.amazonaws.com/prod1/attendance';
+
 const nameForm = document.getElementById('name-form');
 const studentNameInput = document.getElementById('student-name-input');
 const enterNameBtn = document.getElementById('enter-name-btn');
 
 const attendanceSection = document.getElementById('attendance-section');
+const studentNameDisplay = document.getElementById('student-name-display');
 const markAttendanceBtn = document.getElementById('mark-attendance-btn');
 const statusMessage = document.getElementById('status-message');
-const studentNameDisplay = document.getElementById('student-name-display');
 const timeDisplay = document.getElementById('time');
 
-let studentName = localStorage.getItem('studentName') || null;
+// Check if name is already stored
+let studentName = localStorage.getItem('studentName');
 
-// Show attendance section if name is already stored
 if (studentName) {
-    nameForm.style.display = 'none';
-    attendanceSection.style.display = 'block';
-    studentNameDisplay.textContent = studentName;
+    showAttendanceSection(studentName);
 }
 
-// Update time every second
-setInterval(() => {
-    const now = new Date();
-    timeDisplay.textContent = now.toLocaleTimeString();
-}, 1000);
-
-// Handle first-time name entry
 enterNameBtn.addEventListener('click', () => {
     const name = studentNameInput.value.trim();
     if (!name) {
         alert('Please enter your name');
         return;
     }
-    studentName = name;
-    localStorage.setItem('studentName', studentName);
-    studentNameDisplay.textContent = studentName;
-    nameForm.style.display = 'none';
-    attendanceSection.style.display = 'block';
+    localStorage.setItem('studentName', name);
+    showAttendanceSection(name);
 });
 
-// Mark attendance
+function showAttendanceSection(name) {
+    nameForm.style.display = 'none';
+    attendanceSection.style.display = 'block';
+    studentNameDisplay.textContent = name;
+    updateTime();
+    setInterval(updateTime, 1000);
+}
+
+function updateTime() {
+    const now = new Date();
+    timeDisplay.textContent = now.toLocaleTimeString();
+}
+
 markAttendanceBtn.addEventListener('click', () => {
-    statusMessage.textContent = 'Getting location...';
     if (!navigator.geolocation) {
-        statusMessage.textContent = 'Geolocation not supported.';
+        alert('Geolocation is not supported by your browser');
         return;
     }
 
-    navigator.geolocation.getCurrentPosition(async (position) => {
-        const lat = position.coords.latitude;
-        const lon = position.coords.longitude;
+    statusMessage.textContent = 'Getting location...';
 
-        try {
-            const response = await fetch(
-                'https://dhtdt05ncj.execute-api.ap-south-1.amazonaws.com/prod1/attendance',
-                {
+    navigator.geolocation.getCurrentPosition(
+        async (position) => {
+            const latitude = position.coords.latitude;
+            const longitude = position.coords.longitude;
+
+            try {
+                const response = await fetch(API_URL, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
                     body: JSON.stringify({
-                        DeviceID: navigator.userAgent,
-                        Latitude: lat,
-                        Longitude: lon,
-                        StudentName: studentName
+                        DeviceID: getDeviceID(),
+                        StudentName: localStorage.getItem('studentName'),
+                        Latitude: latitude,
+                        Longitude: longitude
                     })
-                }
-            );
+                });
 
-            const text = await response.text();
-            if (response.ok) {
-                statusMessage.textContent = text;
-            } else {
-                statusMessage.textContent = `Error: ${text}`;
+                if (!response.ok) {
+                    const text = await response.text();
+                    statusMessage.style.color = 'red';
+                    statusMessage.textContent = `Error: ${text}`;
+                    return;
+                }
+
+                const result = await response.text();
+                statusMessage.style.color = 'green';
+                statusMessage.textContent = result;
+            } catch (err) {
+                statusMessage.style.color = 'red';
+                statusMessage.textContent = 'Error connecting to server';
             }
-        } catch (err) {
-            statusMessage.textContent = 'Error connecting to server';
+        },
+        (error) => {
+            statusMessage.style.color = 'red';
+            statusMessage.textContent = 'Error getting location';
         }
-    }, (err) => {
-        statusMessage.textContent = 'Error getting location';
-    });
+    );
 });
+
+// Simple device ID generator
+function getDeviceID() {
+    let deviceID = localStorage.getItem('deviceID');
+    if (!deviceID) {
+        deviceID = 'dev-' + Math.random().toString(36).substr(2, 9);
+        localStorage.setItem('deviceID', deviceID);
+    }
+    return deviceID;
+}
