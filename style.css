@@ -146,6 +146,10 @@ input[type="text"]::placeholder {
     font-size: 16px;
 }
 
+.full-width {
+    width: 100%;
+}
+
 /* ATTENDANCE INFO */
 
 .info-row {

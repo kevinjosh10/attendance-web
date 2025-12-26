@@ -124,7 +124,7 @@ markAttendanceBtn.addEventListener('click', () => {
                     data && data.message ? data.message : text;
             } catch (err) {
                 statusMessage.classList.add('error');
-                statusMessage.textContent = 'Error connecting to server';
+                statusMessage.textContent = 'Error connecting to server: ' + err;
             }
         },
         () => {
