@@ -134,6 +134,17 @@ select {
     cursor: pointer;
 }
 
+optgroup {
+    color: var(--text-main);
+    background-color: #020617;
+}
+
+option {
+    background-color: #0b1220;
+    color: var(--text-main);
+    padding: 5px;
+}
+
 /* BUTTONS */
 .primary-btn {
     width: 100%;
