@@ -1,13 +1,17 @@
+// API endpoint
 const API_URL = 'https://dhtdt05ncj.execute-api.ap-south-1.amazonaws.com/prod1/attendance';
 
+// Sections
 const userFormSection = document.getElementById('user-form-section');
 const attendanceSection = document.getElementById('attendance-section');
 
+// Form elements
 const studentNameInput = document.getElementById('student-name-input');
 const departmentInput = document.getElementById('department-input');
 const yearSelect = document.getElementById('year-select');
 const saveDetailsBtn = document.getElementById('save-details-btn');
 
+// Display elements
 const studentNameDisplay = document.getElementById('student-name-display');
 const studentDeptDisplay = document.getElementById('student-dept-display');
 const studentYearDisplay = document.getElementById('student-year-display');
@@ -18,10 +22,11 @@ const timeDisplay = document.getElementById('time-display');
 const statusMessage = document.getElementById('status-message');
 const markAttendanceBtn = document.getElementById('mark-attendance-btn');
 
+// Header date/time
 const currentDateEl = document.getElementById('current-date');
 const currentTimeEl = document.getElementById('current-time');
 
-// Load saved data
+// Load saved data from localStorage
 let storedName = localStorage.getItem('studentName');
 let storedDept = localStorage.getItem('studentDept');
 let storedYear = localStorage.getItem('studentYear');
@@ -33,6 +38,7 @@ if (storedName && storedDept && storedYear) {
     attendanceSection.style.display = 'none';
 }
 
+// Save details button handler
 saveDetailsBtn.addEventListener('click', () => {
     const name = studentNameInput.value.trim();
     const dept = departmentInput.value.trim();
@@ -50,6 +56,7 @@ saveDetailsBtn.addEventListener('click', () => {
     showAttendanceSection(name, dept, year);
 });
 
+// Show attendance section
 function showAttendanceSection(name, dept, year) {
     userFormSection.style.display = 'none';
     attendanceSection.style.display = 'block';
@@ -65,6 +72,7 @@ function showAttendanceSection(name, dept, year) {
     setInterval(updateTime, 1000);
 }
 
+// Update date/time
 function updateTime() {
     const now = new Date();
     const dateStr = now.toLocaleDateString();
@@ -76,6 +84,7 @@ function updateTime() {
     timeDisplay.textContent = timeStr;
 }
 
+// Mark attendance button handler
 markAttendanceBtn.addEventListener('click', () => {
     if (!navigator.geolocation) {
         alert('Geolocation is not supported by your browser');
@@ -90,6 +99,10 @@ markAttendanceBtn.addEventListener('click', () => {
             const latitude = position.coords.latitude;
             const longitude = position.coords.longitude;
 
+            const studentName = localStorage.getItem('studentName');
+            const studentDept = localStorage.getItem('studentDept');
+            const studentYear = localStorage.getItem('studentYear');
+
             try {
                 const response = await fetch(API_URL, {
                     method: 'POST',
@@ -97,8 +110,11 @@ markAttendanceBtn.addEventListener('click', () => {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
+                        // These keys must match your Lambda / Postman body
                         DeviceID: getDeviceID(),
-                        StudentName: localStorage.getItem('studentName'),
+                        StudentName: studentName,
+                        Department: studentDept,
+                        Year: studentYear,
                         Latitude: latitude,
                         Longitude: longitude
                     })
@@ -134,6 +150,7 @@ markAttendanceBtn.addEventListener('click', () => {
     );
 });
 
+// Generate / reuse a simple device ID
 function getDeviceID() {
     let deviceID = localStorage.getItem('deviceID');
     if (!deviceID) {
