@@ -21,12 +21,11 @@ const markAttendanceBtn = document.getElementById('mark-attendance-btn');
 const currentDateEl = document.getElementById('current-date');
 const currentTimeEl = document.getElementById('current-time');
 
-// Load saved data (if any)
+// Load saved data
 let storedName = localStorage.getItem('studentName');
 let storedDept = localStorage.getItem('studentDept');
 let storedYear = localStorage.getItem('studentYear');
 
-// Initialize UI
 if (storedName && storedDept && storedYear) {
     showAttendanceSection(storedName, storedDept, storedYear);
 } else {
@@ -34,7 +33,6 @@ if (storedName && storedDept && storedYear) {
     attendanceSection.style.display = 'none';
 }
 
-// Save details button
 saveDetailsBtn.addEventListener('click', () => {
     const name = studentNameInput.value.trim();
     const dept = departmentInput.value.trim();
@@ -60,11 +58,9 @@ function showAttendanceSection(name, dept, year) {
     studentDeptDisplay.textContent = dept;
     studentYearDisplay.textContent = `${year} Year`;
 
-    // Set today's date once
     const today = new Date();
     todayDisplay.textContent = today.toLocaleDateString();
 
-    // Start time updater
     updateTime();
     setInterval(updateTime, 1000);
 }
@@ -80,7 +76,6 @@ function updateTime() {
     timeDisplay.textContent = timeStr;
 }
 
-// Mark attendance
 markAttendanceBtn.addEventListener('click', () => {
     if (!navigator.geolocation) {
         alert('Geolocation is not supported by your browser');
@@ -113,7 +108,7 @@ markAttendanceBtn.addEventListener('click', () => {
                 let data;
                 try {
                     data = JSON.parse(text);
-                } catch (e) {
+                } catch {
                     data = { message: text };
                 }
 
@@ -132,14 +127,13 @@ markAttendanceBtn.addEventListener('click', () => {
                 statusMessage.textContent = 'Error connecting to server';
             }
         },
-        (error) => {
+        () => {
             statusMessage.classList.add('error');
             statusMessage.textContent = 'Error getting location';
         }
     );
 });
 
-// Device ID
 function getDeviceID() {
     let deviceID = localStorage.getItem('deviceID');
     if (!deviceID) {
