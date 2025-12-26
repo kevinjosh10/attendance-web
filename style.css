@@ -9,7 +9,6 @@
     --success: #4ade80;
 }
 
-/* Reset */
 * {
     box-sizing: border-box;
     margin: 0;
@@ -18,6 +17,7 @@
 
 html, body {
     height: 100%;
+    width: 100%;
 }
 
 body {
@@ -29,7 +29,6 @@ body {
     min-height: 100vh;
 }
 
-/* APP CONTAINER */
 .app-container {
     width: 100%;
     max-width: 430px;
@@ -40,7 +39,6 @@ body {
     box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
 }
 
-/* HEADER */
 .app-header {
     padding: 14px 14px 8px;
     border-bottom: 1px solid rgba(31, 41, 55, 0.9);
@@ -66,13 +64,11 @@ body {
     white-space: nowrap;
 }
 
-/* MAIN CONTENT */
 .app-main {
     padding: 12px 12px 8px;
     flex: 1;
 }
 
-/* CARD */
 .card {
     background: #020617;
     border-radius: 12px;
@@ -93,7 +89,6 @@ body {
     margin-bottom: 12px;
 }
 
-/* FORM FIELDS */
 .form-group {
     margin-bottom: 10px;
     text-align: left;
@@ -124,6 +119,7 @@ select {
 input[type="text"]:focus,
 select:focus {
     border-color: var(--accent);
+    border: 1px solid var(--accent);
 }
 
 input[type="text"]::placeholder {
@@ -136,7 +132,7 @@ select {
 
 optgroup {
     color: var(--text-main);
-    background-color: #020617;
+    background-color: #0b1220;
 }
 
 option {
@@ -145,7 +141,6 @@ option {
     padding: 5px;
 }
 
-/* BUTTONS */
 .primary-btn {
     width: 100%;
     padding: 12px 0;
@@ -162,6 +157,11 @@ option {
     font-family: inherit;
 }
 
+.primary-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba(37, 99, 235, 0.8);
+}
+
 .primary-btn:active {
     transform: scale(0.98);
 }
@@ -175,7 +175,6 @@ option {
     width: 100%;
 }
 
-/* ATTENDANCE INFO */
 .info-row {
     display: flex;
     justify-content: space-between;
@@ -208,7 +207,6 @@ option {
     margin-top: 2px;
 }
 
-/* STATUS TEXT */
 .status-message {
     margin-top: 10px;
     font-size: 13px;
@@ -228,7 +226,6 @@ option {
     font-weight: 500;
 }
 
-/* FOOTER */
 .app-footer {
     padding: 8px 10px 10px;
     border-top: 1px solid #1f2937;
@@ -245,7 +242,6 @@ option {
     color: var(--accent2);
 }
 
-/* RESPONSIVE */
 @media (min-width: 768px) {
     .app-container {
         margin: 20px;
@@ -254,7 +250,6 @@ option {
     }
 }
 
-/* Print styles */
 @media print {
     body {
         background: white;
