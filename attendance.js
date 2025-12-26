@@ -1,5 +1,10 @@
 const API_URL = 'https://dhtdt05ncj.execute-api.ap-south-1.amazonaws.com/prod1/attendance';
 
+// Jerusalem College of Engineering, Pallikaranai coordinates
+const COLLEGE_LATITUDE = 12.9453989;
+const COLLEGE_LONGITUDE = 80.2078173;
+const ALLOWED_RADIUS_METERS = 300; // 300 meters
+
 // Get all DOM elements
 const userFormSection = document.getElementById('user-form-section');
 const attendanceSection = document.getElementById('attendance-section');
@@ -29,14 +34,10 @@ const currentTimeEl = document.getElementById('current-time');
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Page loaded - initializing app');
     
-    // Load any stored data
     loadStoredData();
-    
-    // Start updating time immediately
     updateHeaderTime();
     setInterval(updateHeaderTime, 1000);
     
-    // Attach button listeners
     if (saveDetailsBtn) {
         saveDetailsBtn.addEventListener('click', function(e) {
             e.preventDefault();
@@ -61,19 +62,16 @@ document.addEventListener('DOMContentLoaded', function() {
 function updateHeaderTime() {
     const now = new Date();
     
-    // Format date as MM/DD/YYYY
     const day = String(now.getDate()).padStart(2, '0');
     const month = String(now.getMonth() + 1).padStart(2, '0');
     const year = now.getFullYear();
     const dateStr = month + '/' + day + '/' + year;
     
-    // Format time as HH:MM:SS
     const hours = String(now.getHours()).padStart(2, '0');
     const minutes = String(now.getMinutes()).padStart(2, '0');
     const seconds = String(now.getSeconds()).padStart(2, '0');
     const timeStr = hours + ':' + minutes + ':' + seconds;
     
-    // Update header
     if (currentDateEl) {
         currentDateEl.textContent = dateStr;
     }
@@ -81,7 +79,6 @@ function updateHeaderTime() {
         currentTimeEl.textContent = timeStr;
     }
     
-    // Update attendance section time display
     if (timeDisplay) {
         timeDisplay.textContent = timeStr;
     }
@@ -90,7 +87,6 @@ function updateHeaderTime() {
 function updateAttendanceTime() {
     const now = new Date();
     
-    // Format time as HH:MM:SS
     const hours = String(now.getHours()).padStart(2, '0');
     const minutes = String(now.getMinutes()).padStart(2, '0');
     const seconds = String(now.getSeconds()).padStart(2, '0');
@@ -146,6 +142,41 @@ function getDeviceID() {
 }
 
 // ========================================
+// GEOFENCING - CALCULATE DISTANCE
+// ========================================
+
+function calculateDistance(lat1, lon1, lat2, lon2) {
+    // Haversine formula to calculate distance between two coordinates in meters
+    const R = 6371000; // Earth radius in meters
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = 
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const distance = R * c;
+    return distance;
+}
+
+function checkIfNearCollege(latitude, longitude) {
+    const distance = calculateDistance(
+        COLLEGE_LATITUDE,
+        COLLEGE_LONGITUDE,
+        latitude,
+        longitude
+    );
+    
+    console.log('Distance from college:', distance, 'meters');
+    console.log('Allowed radius:', ALLOWED_RADIUS_METERS, 'meters');
+    
+    return {
+        isNear: distance <= ALLOWED_RADIUS_METERS,
+        distance: distance
+    };
+}
+
+// ========================================
 // SAVE & CONTINUE BUTTON HANDLER
 // ========================================
 
@@ -158,7 +189,6 @@ function handleSaveDetails() {
 
     console.log('Form values:', { name, dept, year });
 
-    // Validation
     if (!name) {
         alert('Please enter your full name');
         studentNameInput.focus();
@@ -177,7 +207,6 @@ function handleSaveDetails() {
         return;
     }
 
-    // Save and show attendance section
     saveStudentData(name, dept, year);
     showAttendanceSection(name, dept, year);
 }
@@ -189,16 +218,13 @@ function handleSaveDetails() {
 function showAttendanceSection(name, dept, year) {
     console.log('Showing attendance section for:', { name, dept, year });
     
-    // Hide form, show attendance
     userFormSection.style.display = 'none';
     attendanceSection.style.display = 'block';
 
-    // Update display values
     studentNameDisplay.textContent = name;
     studentDeptDisplay.textContent = dept;
     studentYearDisplay.textContent = year + ' Year';
 
-    // Show today's date
     const today = new Date();
     const day = String(today.getDate()).padStart(2, '0');
     const month = String(today.getMonth() + 1).padStart(2, '0');
@@ -209,13 +235,9 @@ function showAttendanceSection(name, dept, year) {
         todayDisplay.textContent = dateStr;
     }
 
-    // Update time display
     updateAttendanceTime();
-    
-    // Start updating time every second
     setInterval(updateAttendanceTime, 1000);
 
-    // Clear status message
     if (statusMessage) {
         statusMessage.textContent = '';
         statusMessage.classList.remove('success', 'error');
@@ -229,7 +251,6 @@ function showAttendanceSection(name, dept, year) {
 function handleMarkAttendance() {
     console.log('Mark Attendance clicked');
 
-    // Check geolocation support
     if (!navigator.geolocation) {
         console.error('Geolocation not supported');
         if (statusMessage) {
@@ -240,15 +261,13 @@ function handleMarkAttendance() {
         return;
     }
 
-    // Show loading message
     if (statusMessage) {
         statusMessage.classList.remove('success', 'error');
-        statusMessage.textContent = 'Getting your location...';
+        statusMessage.textContent = '📍 Getting your location...';
     }
 
     console.log('Requesting geolocation');
 
-    // Request geolocation
     navigator.geolocation.getCurrentPosition(
         function onSuccess(position) {
             console.log('Geolocation success:', position);
@@ -259,12 +278,26 @@ function handleMarkAttendance() {
 
             console.log('Location obtained:', { latitude, longitude, accuracy });
 
-            // Get student data
+            // CHECK IF NEAR COLLEGE
+            const locationCheck = checkIfNearCollege(latitude, longitude);
+            
+            if (!locationCheck.isNear) {
+                console.error('User is not near college');
+                
+                if (statusMessage) {
+                    statusMessage.classList.add('error');
+                    statusMessage.classList.remove('success');
+                    statusMessage.textContent = '❌ You are ' + Math.round(locationCheck.distance) + ' meters away from college. You must be within ' + ALLOWED_RADIUS_METERS + ' meters to mark attendance.';
+                }
+                return;
+            }
+
+            console.log('User is near college - proceeding with attendance');
+
             const studentName = localStorage.getItem('studentName');
             const studentDept = localStorage.getItem('studentDept');
             const studentYear = localStorage.getItem('studentYear');
 
-            // Send to API
             sendAttendanceToAPI(studentName, studentDept, studentYear, latitude, longitude);
         },
         function onError(error) {
@@ -275,13 +308,13 @@ function handleMarkAttendance() {
                 statusMessage.classList.remove('success');
 
                 if (error.code === error.PERMISSION_DENIED) {
-                    statusMessage.textContent = 'Location permission denied. Please enable location access in your browser settings.';
+                    statusMessage.textContent = '❌ Location permission denied. Please enable location access in your browser settings.';
                 } else if (error.code === error.POSITION_UNAVAILABLE) {
-                    statusMessage.textContent = 'Location information is unavailable. Please check your GPS/location services.';
+                    statusMessage.textContent = '❌ Location information is unavailable. Please check your GPS/location services.';
                 } else if (error.code === error.TIMEOUT) {
-                    statusMessage.textContent = 'Location request timed out. Please try again.';
+                    statusMessage.textContent = '❌ Location request timed out. Please try again.';
                 } else {
-                    statusMessage.textContent = 'Error getting location: ' + error.message;
+                    statusMessage.textContent = '❌ Error getting location: ' + error.message;
                 }
             }
         },
@@ -313,10 +346,9 @@ function sendAttendanceToAPI(studentName, studentDept, studentYear, latitude, lo
 
     console.log('Payload to send:', payload);
 
-    // Update status
     if (statusMessage) {
         statusMessage.classList.remove('success', 'error');
-        statusMessage.textContent = 'Sending attendance...';
+        statusMessage.textContent = '⏳ Sending attendance...';
     }
 
     fetch(API_URL, {
@@ -353,14 +385,13 @@ function sendAttendanceToAPI(studentName, studentDept, studentYear, latitude, lo
             };
         }
 
-        // Handle response
         if (result.ok || result.status === 200) {
             console.log('Attendance marked successfully');
             
             if (statusMessage) {
                 statusMessage.classList.add('success');
                 statusMessage.classList.remove('error');
-                statusMessage.textContent = data.message || '✓ Attendance marked successfully!';
+                statusMessage.textContent = '✅ ' + (data.message || 'Attendance marked successfully!');
             }
         } else {
             console.error('API error response:', data);
@@ -369,7 +400,7 @@ function sendAttendanceToAPI(studentName, studentDept, studentYear, latitude, lo
                 statusMessage.classList.add('error');
                 statusMessage.classList.remove('success');
                 
-                let errorMsg = 'Error: ';
+                let errorMsg = '❌ Error: ';
                 if (data.message) {
                     errorMsg += data.message;
                 } else if (data.missing) {
@@ -388,13 +419,11 @@ function sendAttendanceToAPI(studentName, studentDept, studentYear, latitude, lo
         if (statusMessage) {
             statusMessage.classList.add('error');
             statusMessage.classList.remove('success');
-            statusMessage.textContent = 'Error connecting to server: ' + error.message;
+            statusMessage.textContent = '❌ Error connecting to server: ' + error.message;
         }
     });
 }
 
-// ========================================
-// LOG INITIALIZATION
-// ========================================
-
-console.log('attendance.js loaded successfully');
+console.log('attendance.js loaded successfully with geofencing enabled');
+console.log('College Location:', COLLEGE_LATITUDE, COLLEGE_LONGITUDE);
+console.log('Allowed Radius:', ALLOWED_RADIUS_METERS, 'meters');
