@@ -10,7 +10,6 @@ const markAttendanceBtn = document.getElementById('mark-attendance-btn');
 const statusMessage = document.getElementById('status-message');
 const timeDisplay = document.getElementById('time');
 
-// Check if name is already stored
 let studentName = localStorage.getItem('studentName');
 
 if (studentName) {
@@ -46,6 +45,7 @@ markAttendanceBtn.addEventListener('click', () => {
         return;
     }
 
+    statusMessage.style.color = 'black';
     statusMessage.textContent = 'Getting location...';
 
     navigator.geolocation.getCurrentPosition(
@@ -67,16 +67,24 @@ markAttendanceBtn.addEventListener('click', () => {
                     })
                 });
 
+                const text = await response.text();
+                let data;
+                try {
+                    data = JSON.parse(text);
+                } catch (e) {
+                    data = { message: text };
+                }
+
                 if (!response.ok) {
-                    const text = await response.text();
                     statusMessage.style.color = 'red';
-                    statusMessage.textContent = `Error: ${text}`;
+                    statusMessage.textContent =
+                        data && data.message ? `Error: ${data.message}` : `Error: ${text}`;
                     return;
                 }
 
-                const result = await response.text();
                 statusMessage.style.color = 'green';
-                statusMessage.textContent = result;
+                statusMessage.textContent =
+                    data && data.message ? data.message : text;
             } catch (err) {
                 statusMessage.style.color = 'red';
                 statusMessage.textContent = 'Error connecting to server';
