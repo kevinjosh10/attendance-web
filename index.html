@@ -2,50 +2,79 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Jerusalem Attendance CSE A</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            padding: 50px;
-        }
-        h1 {
-            font-size: 32px;
-            margin-bottom: 30px;
-        }
-        #welcome {
-            font-size: 28px;
-            margin-bottom: 20px;
-        }
-        input, button {
-            font-size: 18px;
-            padding: 10px 20px;
-            margin: 10px;
-        }
-        #mark-attendance-btn {
-            font-size: 24px;
-            padding: 15px 30px;
-        }
-        #status-message {
-            margin-top: 20px;
-            font-size: 20px;
-            color: green;
-        }
-    </style>
+    <title>Jerusalem College Attendance</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>Jerusalem Attendance CSE A</h1>
+    <div class="app-container">
+        <header class="app-header">
+            <h1>Jerusalem College Attendance</h1>
+            <div class="datetime">
+                <span id="current-date"></span>
+                <span id="current-time"></span>
+            </div>
+        </header>
 
-    <div id="name-form">
-        <input type="text" id="student-name-input" placeholder="Enter your name">
-        <button id="enter-name-btn">Enter</button>
-    </div>
+        <main class="app-main">
+            <!-- First-time form -->
+            <section id="user-form-section" class="card">
+                <h2>Student Details</h2>
+                <p class="subtitle">Please enter your details to continue</p>
 
-    <div id="attendance-section" style="display:none;">
-        <h2 id="welcome">Welcome <span id="student-name-display"></span>!</h2>
-        <p>Current time: <span id="time"></span></p>
-        <button id="mark-attendance-btn">Mark Attendance</button>
-        <p id="status-message"></p>
+                <div class="form-group">
+                    <label for="student-name-input">Full Name</label>
+                    <input type="text" id="student-name-input" placeholder="Enter your name">
+                </div>
+
+                <div class="form-group">
+                    <label for="department-input">Department</label>
+                    <input type="text" id="department-input" placeholder="e.g., CSE A, CSE B">
+                </div>
+
+                <div class="form-group">
+                    <label for="year-select">Year</label>
+                    <select id="year-select">
+                        <option value="">Select your year</option>
+                        <option value="1">1st Year</option>
+                        <option value="2">2nd Year</option>
+                        <option value="3">3rd Year</option>
+                        <option value="4">4th Year</option>
+                    </select>
+                </div>
+
+                <button id="save-details-btn" class="primary-btn">Save & Continue</button>
+            </section>
+
+            <!-- Attendance section -->
+            <section id="attendance-section" class="card" style="display: none;">
+                <h2>Welcome, <span id="student-name-display"></span></h2>
+                <p class="subtitle">
+                    <span id="student-dept-display"></span> •
+                    <span id="student-year-display"></span>
+                </p>
+
+                <div class="info-row">
+                    <div>
+                        <span class="label">Today</span>
+                        <span id="today-display" class="value"></span>
+                    </div>
+                    <div>
+                        <span class="label">Current Time</span>
+                        <span id="time-display" class="value"></span>
+                    </div>
+                </div>
+
+                <button id="mark-attendance-btn" class="primary-btn large">
+                    Mark Attendance
+                </button>
+
+                <p id="status-message" class="status-message"></p>
+            </section>
+        </main>
+
+        <footer class="app-footer">
+            <span>© Jerusalem College of Engineering • Smart Attendance System</span>
+        </footer>
     </div>
 
     <script src="attendance.js" defer></script>
