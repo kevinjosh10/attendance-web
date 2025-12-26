@@ -27,19 +27,21 @@ const currentDateEl = document.getElementById('current-date');
 const currentTimeEl = document.getElementById('current-time');
 
 // Load saved data from localStorage
-let storedName = localStorage.getItem('studentName');
-let storedDept = localStorage.getItem('studentDept');
-let storedYear = localStorage.getItem('studentYear');
+function loadStoredData() {
+    let storedName = localStorage.getItem('studentName');
+    let storedDept = localStorage.getItem('studentDept');
+    let storedYear = localStorage.getItem('studentYear');
 
-if (storedName && storedDept && storedYear) {
-    showAttendanceSection(storedName, storedDept, storedYear);
-} else {
-    userFormSection.style.display = 'block';
-    attendanceSection.style.display = 'none';
+    if (storedName && storedDept && storedYear) {
+        showAttendanceSection(storedName, storedDept, storedYear);
+    } else {
+        userFormSection.style.display = 'block';
+        attendanceSection.style.display = 'none';
+    }
 }
 
 // Save details button handler
-saveDetailsBtn.addEventListener('click', () => {
+saveDetailsBtn.addEventListener('click', function() {
     const name = studentNameInput.value.trim();
     const dept = departmentInput.value.trim();
     const year = yearSelect.value;
@@ -63,7 +65,7 @@ function showAttendanceSection(name, dept, year) {
 
     studentNameDisplay.textContent = name;
     studentDeptDisplay.textContent = dept;
-    studentYearDisplay.textContent = `${year} Year`;
+    studentYearDisplay.textContent = year + ' Year';
 
     const today = new Date();
     todayDisplay.textContent = today.toLocaleDateString();
@@ -78,24 +80,35 @@ function updateTime() {
     const dateStr = now.toLocaleDateString();
     const timeStr = now.toLocaleTimeString();
 
-    if (currentDateEl) currentDateEl.textContent = dateStr;
-    if (currentTimeEl) currentTimeEl.textContent = timeStr;
+    if (currentDateEl) {
+        currentDateEl.textContent = dateStr;
+    }
+    if (currentTimeEl) {
+        currentTimeEl.textContent = timeStr;
+    }
 
-    timeDisplay.textContent = timeStr;
+    if (timeDisplay) {
+        timeDisplay.textContent = timeStr;
+    }
 }
 
 // Mark attendance button handler
-markAttendanceBtn.addEventListener('click', () => {
+markAttendanceBtn.addEventListener('click', function() {
     if (!navigator.geolocation) {
-        alert('Geolocation is not supported by your browser');
+        if (statusMessage) {
+            statusMessage.classList.add('error');
+            statusMessage.textContent = 'Geolocation is not supported by your browser';
+        }
         return;
     }
 
-    statusMessage.classList.remove('success', 'error');
-    statusMessage.textContent = 'Getting location...';
+    if (statusMessage) {
+        statusMessage.classList.remove('success', 'error');
+        statusMessage.textContent = 'Getting location...';
+    }
 
     navigator.geolocation.getCurrentPosition(
-        async (position) => {
+        async function(position) {
             const latitude = position.coords.latitude;
             const longitude = position.coords.longitude;
 
@@ -110,7 +123,6 @@ markAttendanceBtn.addEventListener('click', () => {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        // These keys must match your Lambda / Postman body
                         DeviceID: getDeviceID(),
                         StudentName: studentName,
                         Department: studentDept,
@@ -124,38 +136,11 @@ markAttendanceBtn.addEventListener('click', () => {
                 let data;
                 try {
                     data = JSON.parse(text);
-                } catch {
+                } catch (e) {
                     data = { message: text };
                 }
 
                 if (!response.ok) {
-                    statusMessage.classList.add('error');
-                    statusMessage.textContent =
-                        data && data.message ? `Error: ${data.message}` : `Error: ${text}`;
-                    return;
-                }
-
-                statusMessage.classList.add('success');
-                statusMessage.textContent =
-                    data && data.message ? data.message : text;
-            } catch (err) {
-                statusMessage.classList.add('error');
-                statusMessage.textContent = 'Error connecting to server: ' + err;
-            }
-        },
-        () => {
-            statusMessage.classList.add('error');
-            statusMessage.textContent = 'Error getting location';
-        }
-    );
-});
-
-// Generate / reuse a simple device ID
-function getDeviceID() {
-    let deviceID = localStorage.getItem('deviceID');
-    if (!deviceID) {
-        deviceID = 'dev-' + Math.random().toString(36).substr(2, 9);
-        localStorage.setItem('deviceID', deviceID);
-    }
-    return deviceID;
-}
+                    if (statusMessage) {
+                        statusMessage.classList.add('error');
+                        statusMessage.textContent =
