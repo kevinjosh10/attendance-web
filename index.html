@@ -2,87 +2,546 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Jerusalem Attendance System</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jerusalem Attendance System - CSE A</title>
     <style>
+        :root {
+            --bg-color: #020617;
+            --card-bg: #0b1220;
+            --accent: #3b82f6;
+            --accent2: #22c55e;
+            --text-main: #f9fafb;
+            --text-muted: #9ca3af;
+            --error: #f97373;
+            --success: #4ade80;
+            --border: #1f2937;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
+            height: 100%;
+            width: 100%;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+
         body {
-            font-family: Arial, sans-serif;
+            background: radial-gradient(circle at top, #1f2937 0, #020617 55%, #000 100%);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 10px;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 430px;
+            min-height: 100vh;
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.98), rgba(15, 23, 42, 0.92));
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
+            border-radius: 24px;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .app-header {
+            padding: 20px 20px 16px;
+            border-bottom: 1px solid rgba(31, 41, 55, 0.9);
+            background: rgba(11, 18, 32, 0.8);
+            backdrop-filter: blur(20px);
+        }
+
+        .app-header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-align: center;
+            margin-bottom: 4px;
+        }
+
+        .datetime {
+            text-align: center;
+            font-size: 13px;
+            color: var(--text-muted);
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .app-main {
+            flex: 1;
+            padding: 24px 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            min-height: 100vh;
-            background-color: #f5f5f5;
-            margin: 0;
+            gap: 24px;
         }
 
-        h1 {
-            margin-bottom: 10px;
-            font-size: 2.2em;
+        .welcome-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            padding: 24px 20px;
             text-align: center;
-            color: #1a1a1a;
+            box-shadow: 0 20px 40px rgba(15, 23, 42, 0.6);
+            width: 100%;
+            animation: slideUp 0.6s ease-out;
         }
 
-        h2 {
-            margin-bottom: 30px;
-            font-size: 1.8em;
-            text-align: center;
-            color: #333;
+        .welcome-card h2 {
+            font-size: 20px;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-main);
         }
 
-        #name-form, #attendance-section {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 15px;
+        .student-name {
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 12px;
+        }
+
+        .name-form, .attendance-section {
+            width: 100%;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        .name-form {
+            max-width: 320px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: var(--text-muted);
+            font-weight: 500;
         }
 
         input[type="text"] {
-            padding: 12px;
-            font-size: 1.2em;
-            width: 250px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
+            width: 100%;
+            padding: 16px 20px;
+            font-size: 16px;
+            border-radius: 16px;
+            border: 2px solid var(--border);
+            background: var(--card-bg);
+            color: var(--text-main);
+            outline: none;
+            transition: all 0.3s ease;
+            font-family: inherit;
+            font-weight: 500;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+            transform: translateY(-2px);
+        }
+
+        input[type="text"]::placeholder {
+            color: rgba(156, 163, 175, 0.6);
+        }
+
+        .primary-btn {
+            width: 100%;
+            padding: 16px 0;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 16px;
+            border: none;
+            cursor: pointer;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            color: #ffffff;
+            box-shadow: 0 12px 28px rgba(37, 99, 235, 0.4);
+            transition: all 0.3s ease;
+            font-family: inherit;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .primary-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 16px 32px rgba(37, 99, 235, 0.5);
+        }
+
+        .primary-btn:active {
+            transform: scale(0.98);
+        }
+
+        .attendance-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            padding: 28px 24px;
+            box-shadow: 0 20px 40px rgba(15, 23, 42, 0.6);
+            width: 100%;
             text-align: center;
         }
 
-        button {
-            padding: 15px 30px;
-            font-size: 1.3em;
-            border: none;
-            border-radius: 8px;
-            background-color: #007bff;
-            color: white;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
+        .current-time {
+            font-size: 36px;
+            font-weight: 300;
+            color: var(--text-main);
+            margin-bottom: 8px;
+            letter-spacing: -0.02em;
         }
 
-        button:hover {
-            background-color: #0056b3;
+        .mark-attendance-btn {
+            margin-top: 24px;
         }
 
-        #time, #status-message {
-            font-size: 1.2em;
-            color: #444;
+        .status-message {
+            margin-top: 20px;
+            font-size: 15px;
+            min-height: 24px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-weight: 500;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.4s ease;
+        }
+
+        .status-message.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .status-message.success {
+            background: rgba(34, 197, 94, 0.2);
+            color: var(--success);
+            border: 1px solid var(--success);
+        }
+
+        .status-message.error {
+            background: rgba(249, 115, 115, 0.2);
+            color: var(--error);
+            border: 1px solid var(--error);
+        }
+
+        .location-info {
+            margin-top: 16px;
+            padding: 12px 16px;
+            background: rgba(59, 130, 246, 0.1);
+            border-radius: 12px;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .location-info.hidden {
+            display: none;
+        }
+
+        .app-footer {
+            padding: 16px 20px;
+            border-top: 1px solid var(--border);
+            font-size: 12px;
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        .author-line {
+            font-weight: 600;
+            color: var(--accent2);
+            margin-top: 4px;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .app-container {
+                border-radius: 20px;
+                margin: 0;
+            }
+            
+            .app-main {
+                padding: 20px 16px;
+            }
+        }
+
+        .loading {
+            position: relative;
+            color: var(--accent);
+        }
+
+        .loading::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border: 2px solid transparent;
+            border-top: 2px solid currentColor;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .loading span {
+            visibility: hidden;
+        }
+
+        @keyframes spin {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
         }
     </style>
 </head>
 <body>
-    <h1>Jerusalem Attendance CSE A</h1>
-    <h2 id="welcome">Welcome <span id="student-name-display"></span>!</h2>
+    <div class="app-container">
+        <!-- Header -->
+        <div class="app-header">
+            <h1>Jerusalem Attendance</h1>
+            <div class="datetime">
+                <div id="current-date"></div>
+                <div id="current-time"></div>
+            </div>
+        </div>
 
-    <!-- Name entry form -->
-    <div id="name-form">
-        <input type="text" id="student-name-input" placeholder="Enter your name">
-        <button id="enter-name-btn">Enter</button>
+        <!-- Main Content -->
+        <div class="app-main">
+            <!-- Name Entry Form -->
+            <div id="name-form" class="name-form">
+                <div class="welcome-card">
+                    <h2>👋 Welcome Student</h2>
+                    <div class="form-group">
+                        <label for="student-name-input">Enter your full name</label>
+                        <input type="text" id="student-name-input" placeholder="e.g. John Doe" maxlength="50">
+                    </div>
+                    <button id="enter-name-btn" class="primary-btn">Continue</button>
+                </div>
+            </div>
+
+            <!-- Attendance Section -->
+            <div id="attendance-section" class="attendance-section" style="display: none;">
+                <div class="welcome-card">
+                    <h2>Welcome back!</h2>
+                    <div class="student-name" id="student-name-display"></div>
+                </div>
+                
+                <div class="attendance-card">
+                    <div class="current-time" id="current-time-display"></div>
+                    <div id="location-info" class="location-info hidden">
+                        📍 Location: <span id="location-display"></span>
+                    </div>
+                    <button id="mark-attendance-btn" class="primary-btn mark-attendance-btn">
+                        Mark Attendance
+                    </button>
+                    <div id="status-message" class="status-message"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="app-footer">
+            <div>Geolocation-based Attendance System</div>
+            <div class="author-line">Built with AWS Lambda & API Gateway</div>
+        </div>
     </div>
 
-    <!-- Attendance section -->
-    <div id="attendance-section" style="display:none;">
-        <p>Current time: <span id="time"></span></p>
-        <button id="mark-attendance-btn">Mark Attendance</button>
-        <p id="status-message"></p>
-    </div>
+    <script>
+        const apiUrl = 'https://dhtdt05ncj.execute-api.ap-south-1.amazonaws.com/prod1/attendance';
 
-    <script src="attendance.js" defer></script>
+        // DOM Elements
+        const nameForm = document.getElementById('name-form');
+        const attendanceSection = document.getElementById('attendance-section');
+        const studentNameInput = document.getElementById('student-name-input');
+        const enterNameBtn = document.getElementById('enter-name-btn');
+        const markAttendanceBtn = document.getElementById('mark-attendance-btn');
+        const timeDisplay = document.getElementById('current-time-display');
+        const dateDisplay = document.getElementById('current-date');
+        const statusMessage = document.getElementById('status-message');
+        const welcomeDisplay = document.getElementById('student-name-display');
+        const locationInfo = document.getElementById('location-info');
+        const locationDisplay = document.getElementById('location-display');
+        const currentTimeFooter = document.getElementById('current-time');
+
+        let deviceID = localStorage.getItem('deviceID');
+        let studentName = localStorage.getItem('studentName');
+
+        // Generate random deviceID if not exists
+        if (!deviceID) {
+            deviceID = 'device-' + Math.random().toString(36).substr(2, 9);
+            localStorage.setItem('deviceID', deviceID);
+        }
+
+        // Update date and time
+        function updateDateTime() {
+            const now = new Date();
+            timeDisplay.textContent = now.toLocaleTimeString('en-IN', { 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                second: '2-digit',
+                hour12: true 
+            });
+            dateDisplay.textContent = now.toLocaleDateString('en-IN', { 
+                weekday: 'short', 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric' 
+            });
+        }
+
+        setInterval(updateDateTime, 1000);
+        updateDateTime();
+
+        // Show status message with animation
+        function showStatus(message, type = '') {
+            statusMessage.textContent = message;
+            statusMessage.className = `status-message ${type} show`;
+            setTimeout(() => {
+                statusMessage.classList.remove('show');
+            }, 5000);
+        }
+
+        // Hide location info
+        function hideLocation() {
+            locationInfo.classList.add('hidden');
+        }
+
+        // Check if student name exists
+        if (studentName) {
+            nameForm.style.display = 'none';
+            attendanceSection.style.display = 'flex';
+            welcomeDisplay.textContent = studentName;
+        }
+
+        // Handle name entry
+        enterNameBtn.addEventListener('click', () => {
+            const name = studentNameInput.value.trim();
+            if (!name) {
+                showStatus('Please enter your name', 'error');
+                studentNameInput.focus();
+                return;
+            }
+            studentName = name;
+            localStorage.setItem('studentName', studentName);
+            welcomeDisplay.textContent = studentName;
+            nameForm.style.display = 'none';
+            attendanceSection.style.display = 'flex';
+            showStatus(`Welcome ${studentName}! Ready to mark attendance.`, 'success');
+        });
+
+        // Handle Enter key for name input
+        studentNameInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                enterNameBtn.click();
+            }
+        });
+
+        // Handle attendance marking
+        markAttendanceBtn.addEventListener('click', async () => {
+            if (!navigator.geolocation) {
+                showStatus('Geolocation not supported by your browser', 'error');
+                return;
+            }
+
+            markAttendanceBtn.classList.add('loading');
+            markAttendanceBtn.innerHTML = '<span>Loading...</span>';
+            statusMessage.classList.remove('show');
+            hideLocation();
+
+            navigator.geolocation.getCurrentPosition(
+                async (position) => {
+                    const { latitude, longitude, accuracy } = position.coords;
+                    
+                    // Show location info
+                    locationDisplay.textContent = `${latitude.toFixed(6)}, ${longitude.toFixed(6)} (±${accuracy.toFixed(0)}m)`;
+                    locationInfo.classList.remove('hidden');
+
+                    try {
+                        const response = await fetch(apiUrl, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                DeviceID: deviceID,
+                                StudentName: studentName,
+                                Latitude: latitude,
+                                Longitude: longitude,
+                                Accuracy: accuracy,
+                                Timestamp: new Date().toISOString()
+                            })
+                        });
+
+                        const text = await response.text();
+
+                        if (response.ok) {
+                            showStatus(text || '✅ Attendance marked successfully!', 'success');
+                        } else {
+                            showStatus(`Error: ${text || 'Server error'}`, 'error');
+                        }
+                    } catch (error) {
+                        showStatus('❌ Network error. Please check your connection.', 'error');
+                        console.error('Attendance API error:', error);
+                    } finally {
+                        markAttendanceBtn.classList.remove('loading');
+                        markAttendanceBtn.innerHTML = 'Mark Attendance';
+                    }
+                },
+                (error) => {
+                    let errorMsg = 'Unable to get location';
+                    switch (error.code) {
+                        case error.PERMISSION_DENIED:
+                            errorMsg = 'Location access denied. Please enable location permissions.';
+                            break;
+                        case error.POSITION_UNAVAILABLE:
+                            errorMsg = 'Location information unavailable.';
+                            break;
+                        case error.TIMEOUT:
+                            errorMsg = 'Location request timed out.';
+                            break;
+                    }
+                    showStatus(errorMsg, 'error');
+                    markAttendanceBtn.classList.remove('loading');
+                    markAttendanceBtn.innerHTML = 'Mark Attendance';
+                },
+                { 
+                    enableHighAccuracy: true, 
+                    timeout: 15000, 
+                    maximumAge: 60000 
+                }
+            );
+        });
+
+        // Reset student name on double-click (for demo/testing)
+        document.addEventListener('dblclick', (e) => {
+            if (e.target.closest('.app-container')) {
+                if (confirm('Reset student name?')) {
+                    localStorage.removeItem('studentName');
+                    location.reload();
+                }
+            }
+        });
+    </script>
 </body>
 </html>
