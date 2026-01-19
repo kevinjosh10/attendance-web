@@ -6,15 +6,24 @@
     <title>Jerusalem Attendance System - CSE A</title>
     <style>
         :root {
-            --bg-color: #020617;
-            --card-bg: #0b1220;
+            --bg-color: #0a0e1a;
+            --card-bg: #0f172a;
+            --glass-bg: rgba(15, 23, 42, 0.6);
             --accent: #3b82f6;
             --accent2: #22c55e;
-            --text-main: #f9fafb;
-            --text-muted: #9ca3af;
-            --error: #f97373;
+            --accent3: #a855f7;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --text-dim: #64748b;
+            --error: #f87171;
             --success: #4ade80;
-            --border: #1f2937;
+            --warning: #facc15;
+            --border: rgba(59, 130, 246, 0.2);
+            --border-light: rgba(148, 163, 184, 0.1);
+            --shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            --shadow-glow: 0 0 30px rgba(59, 130, 246, 0.3);
+            --radius: 24px;
+            --radius-sm: 16px;
         }
 
         * {
@@ -26,154 +35,200 @@
         html, body {
             height: 100%;
             width: 100%;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
 
         body {
-            background: radial-gradient(circle at top, #1f2937 0, #020617 55%, #000 100%);
+            background: linear-gradient(135deg, #0a0e1a 0%, #1e1b4b 50%, #0f172a 100%);
             color: var(--text-main);
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            padding: 10px;
+            padding: 12px;
         }
 
         .app-container {
             width: 100%;
-            max-width: 430px;
-            min-height: 100vh;
-            background: linear-gradient(135deg, rgba(15, 23, 42, 0.98), rgba(15, 23, 42, 0.92));
+            max-width: 440px;
+            min-height: 95vh;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius);
             display: flex;
             flex-direction: column;
-            box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
-            border-radius: 24px;
+            box-shadow: var(--shadow);
             overflow: hidden;
-            backdrop-filter: blur(10px);
         }
 
         .app-header {
-            padding: 20px 20px 16px;
-            border-bottom: 1px solid rgba(31, 41, 55, 0.9);
-            background: rgba(11, 18, 32, 0.8);
-            backdrop-filter: blur(20px);
+            padding: 24px 24px 20px;
+            border-bottom: 1px solid var(--border-light);
+            background: rgba(15, 23, 42, 0.8);
+            position: relative;
         }
 
         .app-header h1 {
-            font-size: 24px;
-            font-weight: 700;
-            letter-spacing: -0.02em;
+            font-size: 28px;
+            font-weight: 800;
             background: linear-gradient(135deg, var(--accent), var(--accent2));
+            background-clip: text;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            background-clip: text;
             text-align: center;
-            margin-bottom: 4px;
+            margin-bottom: 8px;
+        }
+
+        .app-header h1::after {
+            content: 'CSE A';
+            font-size: 12px;
+            font-weight: 600;
+            background: linear-gradient(135deg, var(--accent2), var(--accent3));
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: block;
+            opacity: 0.8;
         }
 
         .datetime {
-            text-align: center;
-            font-size: 13px;
-            color: var(--text-muted);
             display: flex;
             flex-direction: column;
-            gap: 2px;
+            align-items: center;
+            gap: 4px;
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        #current-date { font-size: 13px; opacity: 0.8; }
+        #current-time { 
+            font-size: 22px; 
+            font-weight: 500;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         .app-main {
             flex: 1;
-            padding: 24px 20px;
+            padding: 32px 24px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 24px;
+            gap: 28px;
         }
 
-        .welcome-card {
+        .card {
             background: var(--card-bg);
-            border-radius: 20px;
-            border: 1px solid var(--border);
-            padding: 24px 20px;
-            text-align: center;
-            box-shadow: 0 20px 40px rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-sm);
+            padding: 32px 28px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
             width: 100%;
-            animation: slideUp 0.6s ease-out;
+            text-align: center;
+            position: relative;
+            transition: all 0.4s ease;
         }
 
-        .welcome-card h2 {
-            font-size: 20px;
-            margin-bottom: 8px;
-            font-weight: 600;
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
+        }
+
+        .card h2 {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 16px;
             color: var(--text-main);
         }
 
-        .student-name {
-            font-size: 28px;
-            font-weight: 700;
+        .student-details {
+            font-size: 32px;
+            font-weight: 800;
             background: linear-gradient(135deg, var(--accent), var(--accent2));
+            background-clip: text;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 12px;
-        }
-
-        .name-form, .attendance-section {
-            width: 100%;
-            animation: slideUp 0.6s ease-out;
+            margin-bottom: 20px;
+            line-height: 1.3;
         }
 
         .name-form {
-            max-width: 320px;
+            max-width: 400px;
+            animation: slideUp 0.7s ease-out;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 24px;
         }
 
         .form-group {
-            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
         }
 
         .form-group label {
-            display: block;
             margin-bottom: 8px;
-            font-size: 14px;
+            font-size: 15px;
+            font-weight: 600;
             color: var(--text-muted);
-            font-weight: 500;
         }
 
-        input[type="text"] {
+        input[type="text"], select {
             width: 100%;
-            padding: 16px 20px;
+            padding: 18px 20px;
             font-size: 16px;
-            border-radius: 16px;
-            border: 2px solid var(--border);
-            background: var(--card-bg);
+            font-weight: 500;
+            border-radius: 12px;
+            border: 2px solid var(--border-light);
+            background: rgba(15, 23, 42, 0.8);
             color: var(--text-main);
             outline: none;
             transition: all 0.3s ease;
             font-family: inherit;
-            font-weight: 500;
         }
 
-        input[type="text"]:focus {
+        input[type="text"]:focus, select:focus {
             border-color: var(--accent);
             box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
             transform: translateY(-2px);
         }
 
+        select {
+            cursor: pointer;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            background-size: 20px;
+            padding-right: 50px;
+            appearance: none;
+        }
+
         input[type="text"]::placeholder {
-            color: rgba(156, 163, 175, 0.6);
+            color: rgba(148, 163, 184, 0.5);
         }
 
         .primary-btn {
             width: 100%;
-            padding: 16px 0;
-            font-size: 16px;
-            font-weight: 600;
-            border-radius: 16px;
+            padding: 20px 0;
+            font-size: 18px;
+            font-weight: 700;
+            border-radius: 12px;
             border: none;
             cursor: pointer;
             background: linear-gradient(135deg, var(--accent), var(--accent2));
             color: #ffffff;
-            box-shadow: 0 12px 28px rgba(37, 99, 235, 0.4);
+            box-shadow: 0 12px 28px rgba(59, 130, 246, 0.4);
             transition: all 0.3s ease;
             font-family: inherit;
             position: relative;
@@ -182,7 +237,7 @@
 
         .primary-btn:hover {
             transform: translateY(-3px);
-            box-shadow: 0 16px 32px rgba(37, 99, 235, 0.5);
+            box-shadow: 0 16px 32px rgba(59, 130, 246, 0.5);
         }
 
         .primary-btn:active {
@@ -190,37 +245,42 @@
         }
 
         .attendance-card {
-            background: var(--card-bg);
-            border-radius: 20px;
-            border: 1px solid var(--border);
-            padding: 28px 24px;
-            box-shadow: 0 20px 40px rgba(15, 23, 42, 0.6);
-            width: 100%;
-            text-align: center;
+            margin-top: 12px;
         }
 
         .current-time {
-            font-size: 36px;
-            font-weight: 300;
+            font-size: 48px;
+            font-weight: 200;
             color: var(--text-main);
-            margin-bottom: 8px;
-            letter-spacing: -0.02em;
+            margin-bottom: 16px;
+            letter-spacing: -0.05em;
         }
 
-        .mark-attendance-btn {
-            margin-top: 24px;
+        .location-info {
+            margin-top: 20px;
+            padding: 16px 20px;
+            background: rgba(59, 130, 246, 0.15);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .location-info.hidden {
+            display: none;
         }
 
         .status-message {
-            margin-top: 20px;
-            font-size: 15px;
-            min-height: 24px;
-            padding: 12px 16px;
+            margin-top: 24px;
+            padding: 16px 20px;
             border-radius: 12px;
-            font-weight: 500;
+            font-size: 16px;
+            font-weight: 600;
+            text-align: center;
+            min-height: 24px;
             opacity: 0;
-            transform: translateY(10px);
-            transition: all 0.4s ease;
+            transform: translateY(20px);
+            transition: all 0.5s ease;
         }
 
         .status-message.show {
@@ -230,46 +290,29 @@
 
         .status-message.success {
             background: rgba(34, 197, 94, 0.2);
-            color: var(--success);
             border: 1px solid var(--success);
+            color: var(--success);
         }
 
         .status-message.error {
-            background: rgba(249, 115, 115, 0.2);
-            color: var(--error);
+            background: rgba(248, 113, 113, 0.2);
             border: 1px solid var(--error);
-        }
-
-        .location-info {
-            margin-top: 16px;
-            padding: 12px 16px;
-            background: rgba(59, 130, 246, 0.1);
-            border-radius: 12px;
-            border: 1px solid rgba(59, 130, 246, 0.3);
-        }
-
-        .location-info.hidden {
-            display: none;
+            color: var(--error);
         }
 
         .app-footer {
-            padding: 16px 20px;
-            border-top: 1px solid var(--border);
-            font-size: 12px;
+            padding: 20px 24px;
+            border-top: 1px solid var(--border-light);
+            font-size: 13px;
             color: var(--text-muted);
             text-align: center;
-        }
-
-        .author-line {
-            font-weight: 600;
-            color: var(--accent2);
-            margin-top: 4px;
+            background: rgba(15, 23, 42, 0.6);
         }
 
         @keyframes slideUp {
             from {
                 opacity: 0;
-                transform: translateY(30px);
+                transform: translateY(40px);
             }
             to {
                 opacity: 1;
@@ -277,43 +320,43 @@
             }
         }
 
-        @media (max-width: 480px) {
-            .app-container {
-                border-radius: 20px;
-                margin: 0;
-            }
-            
-            .app-main {
-                padding: 20px 16px;
-            }
-        }
-
         .loading {
             position: relative;
-            color: var(--accent);
+            color: transparent;
         }
 
         .loading::after {
             content: '';
             position: absolute;
-            width: 20px;
-            height: 20px;
+            width: 24px;
+            height: 24px;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            border: 2px solid transparent;
-            border-top: 2px solid currentColor;
+            border: 3px solid rgba(255, 255, 255, 0.2);
+            border-top: 3px solid #ffffff;
             border-radius: 50%;
             animation: spin 1s linear infinite;
-        }
-
-        .loading span {
-            visibility: hidden;
         }
 
         @keyframes spin {
             0% { transform: translate(-50%, -50%) rotate(0deg); }
             100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        @media (max-width: 480px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+            
+            .app-main {
+                padding: 28px 20px;
+            }
+            
+            .current-time {
+                font-size: 40px;
+            }
         }
     </style>
 </head>
@@ -330,31 +373,60 @@
 
         <!-- Main Content -->
         <div class="app-main">
-            <!-- Name Entry Form -->
-            <div id="name-form" class="name-form">
-                <div class="welcome-card">
+            <!-- Student Details Form -->
+            <div id="student-form" class="name-form">
+                <div class="card">
                     <h2>👋 Welcome Student</h2>
-                    <div class="form-group">
-                        <label for="student-name-input">Enter your full name</label>
-                        <input type="text" id="student-name-input" placeholder="e.g. John Doe" maxlength="50">
+                    <p style="color: var(--text-muted); margin-bottom: 24px;">Enter your details to continue</p>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="student-name">Full Name</label>
+                            <input type="text" id="student-name" placeholder="John Doe" maxlength="50">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="department">Department</label>
+                            <select id="department">
+                                <option value="">Select Department</option>
+                                <option value="CSE">Computer Science & Engineering</option>
+                                <option value="ECE">Electronics & Communication</option>
+                                <option value="EEE">Electrical & Electronics</option>
+                                <option value="MECH">Mechanical Engineering</option>
+                                <option value="CIVIL">Civil Engineering</option>
+                                <option value="IT">Information Technology</option>
+                            </select>
+                        </div>
                     </div>
-                    <button id="enter-name-btn" class="primary-btn">Continue</button>
+                    
+                    <div class="form-group full-width">
+                        <label for="year">Academic Year</label>
+                        <select id="year">
+                            <option value="">Select Year</option>
+                            <option value="1">1st Year</option>
+                            <option value="2">2nd Year</option>
+                            <option value="3">3rd Year</option>
+                            <option value="4">4th Year</option>
+                        </select>
+                    </div>
+                    
+                    <button id="continue-btn" class="primary-btn">Continue</button>
                 </div>
             </div>
 
             <!-- Attendance Section -->
-            <div id="attendance-section" class="attendance-section" style="display: none;">
-                <div class="welcome-card">
+            <div id="attendance-section" style="display: none;">
+                <div class="card">
                     <h2>Welcome back!</h2>
-                    <div class="student-name" id="student-name-display"></div>
+                    <div class="student-details" id="student-details-display"></div>
                 </div>
                 
-                <div class="attendance-card">
+                <div class="card attendance-card">
                     <div class="current-time" id="current-time-display"></div>
                     <div id="location-info" class="location-info hidden">
                         📍 Location: <span id="location-display"></span>
                     </div>
-                    <button id="mark-attendance-btn" class="primary-btn mark-attendance-btn">
+                    <button id="mark-attendance-btn" class="primary-btn">
                         Mark Attendance
                     </button>
                     <div id="status-message" class="status-message"></div>
@@ -365,7 +437,7 @@
         <!-- Footer -->
         <div class="app-footer">
             <div>Geolocation-based Attendance System</div>
-            <div class="author-line">Built with AWS Lambda & API Gateway</div>
+            <div style="color: var(--accent2); font-weight: 600;">Built with AWS Lambda & API Gateway</div>
         </div>
     </div>
 
@@ -373,119 +445,141 @@
         const apiUrl = 'https://dhtdt05ncj.execute-api.ap-south-1.amazonaws.com/prod1/attendance';
 
         // DOM Elements
-        const nameForm = document.getElementById('name-form');
+        const studentForm = document.getElementById('student-form');
         const attendanceSection = document.getElementById('attendance-section');
-        const studentNameInput = document.getElementById('student-name-input');
-        const enterNameBtn = document.getElementById('enter-name-btn');
+        const studentNameInput = document.getElementById('student-name');
+        const departmentSelect = document.getElementById('department');
+        const yearSelect = document.getElementById('year');
+        const continueBtn = document.getElementById('continue-btn');
         const markAttendanceBtn = document.getElementById('mark-attendance-btn');
         const timeDisplay = document.getElementById('current-time-display');
         const dateDisplay = document.getElementById('current-date');
         const statusMessage = document.getElementById('status-message');
-        const welcomeDisplay = document.getElementById('student-name-display');
+        const studentDetailsDisplay = document.getElementById('student-details-display');
         const locationInfo = document.getElementById('location-info');
         const locationDisplay = document.getElementById('location-display');
-        const currentTimeFooter = document.getElementById('current-time');
+        const currentTimeHeader = document.getElementById('current-time');
 
-        let deviceID = localStorage.getItem('deviceID');
-        let studentName = localStorage.getItem('studentName');
+        // App State
+        let appState = {
+            deviceID: localStorage.getItem('deviceID') || 'device-' + Math.random().toString(36).substr(2, 9),
+            studentName: localStorage.getItem('studentName') || null,
+            department: localStorage.getItem('department') || null,
+            year: localStorage.getItem('year') || null
+        };
 
-        // Generate random deviceID if not exists
-        if (!deviceID) {
-            deviceID = 'device-' + Math.random().toString(36).substr(2, 9);
-            localStorage.setItem('deviceID', deviceID);
-        }
+        // Initialize
+        localStorage.setItem('deviceID', appState.deviceID);
+        updateDateTime();
+        setupEventListeners();
+        checkStoredData();
 
-        // Update date and time
         function updateDateTime() {
             const now = new Date();
             timeDisplay.textContent = now.toLocaleTimeString('en-IN', { 
-                hour: '2-digit', 
-                minute: '2-digit', 
-                second: '2-digit',
-                hour12: true 
+                hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true 
             });
             dateDisplay.textContent = now.toLocaleDateString('en-IN', { 
-                weekday: 'short', 
-                year: 'numeric', 
-                month: 'short', 
-                day: 'numeric' 
+                weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' 
+            });
+            currentTimeHeader.textContent = now.toLocaleTimeString('en-IN', { 
+                hour: '2-digit', minute: '2-digit', hour12: true 
             });
         }
 
         setInterval(updateDateTime, 1000);
-        updateDateTime();
 
-        // Show status message with animation
-        function showStatus(message, type = '') {
-            statusMessage.textContent = message;
-            statusMessage.className = `status-message ${type} show`;
-            setTimeout(() => {
-                statusMessage.classList.remove('show');
-            }, 5000);
+        function setupEventListeners() {
+            continueBtn.addEventListener('click', handleContinue);
+            [studentNameInput, departmentSelect, yearSelect].forEach(el => {
+                el.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') handleContinue();
+                });
+            });
+            markAttendanceBtn.addEventListener('click', handleMarkAttendance);
+            
+            // Reset on double-click
+            document.addEventListener('dblclick', () => {
+                if (confirm('Reset all data?')) {
+                    localStorage.clear();
+                    location.reload();
+                }
+            });
         }
 
-        // Hide location info
-        function hideLocation() {
-            locationInfo.classList.add('hidden');
-        }
-
-        // Check if student name exists
-        if (studentName) {
-            nameForm.style.display = 'none';
-            attendanceSection.style.display = 'flex';
-            welcomeDisplay.textContent = studentName;
-        }
-
-        // Handle name entry
-        enterNameBtn.addEventListener('click', () => {
-            const name = studentNameInput.value.trim();
-            if (!name) {
-                showStatus('Please enter your name', 'error');
+        function checkStoredData() {
+            if (appState.studentName && appState.department && appState.year) {
+                showAttendanceSection();
+            } else {
                 studentNameInput.focus();
+            }
+        }
+
+        function handleContinue() {
+            const name = studentNameInput.value.trim();
+            const dept = departmentSelect.value;
+            const yr = yearSelect.value;
+
+            if (!name || name.length < 2) {
+                showStatus('Please enter your full name (min 2 chars)', 'error');
                 return;
             }
-            studentName = name;
-            localStorage.setItem('studentName', studentName);
-            welcomeDisplay.textContent = studentName;
-            nameForm.style.display = 'none';
-            attendanceSection.style.display = 'flex';
-            showStatus(`Welcome ${studentName}! Ready to mark attendance.`, 'success');
-        });
-
-        // Handle Enter key for name input
-        studentNameInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                enterNameBtn.click();
+            if (!dept) {
+                showStatus('Please select your department', 'error');
+                return;
             }
-        });
+            if (!yr) {
+                showStatus('Please select your academic year', 'error');
+                return;
+            }
 
-        // Handle attendance marking
-        markAttendanceBtn.addEventListener('click', async () => {
+            // Save data
+            appState.studentName = name;
+            appState.department = dept;
+            appState.year = yr;
+            
+            localStorage.setItem('studentName', name);
+            localStorage.setItem('department', dept);
+            localStorage.setItem('year', yr);
+
+            showAttendanceSection();
+        }
+
+        function showAttendanceSection() {
+            const details = `${appState.studentName}<br>
+                           <span style="font-size: 0.6em; opacity: 0.8;">${appState.department} - ${appState.year} Year</span>`;
+            studentDetailsDisplay.innerHTML = details;
+            
+            studentForm.style.display = 'none';
+            attendanceSection.style.display = 'block';
+            showStatus(`Welcome ${appState.studentName}! Ready to mark attendance.`, 'success');
+        }
+
+        async function handleMarkAttendance() {
             if (!navigator.geolocation) {
-                showStatus('Geolocation not supported by your browser', 'error');
+                showStatus('Geolocation not supported', 'error');
                 return;
             }
 
             markAttendanceBtn.classList.add('loading');
-            markAttendanceBtn.innerHTML = '<span>Loading...</span>';
-            statusMessage.classList.remove('show');
+            markAttendanceBtn.innerHTML = '<span>Getting location...</span>';
+            clearStatus();
             hideLocation();
 
             navigator.geolocation.getCurrentPosition(
                 async (position) => {
                     const { latitude, longitude, accuracy } = position.coords;
-                    
-                    // Show location info
-                    locationDisplay.textContent = `${latitude.toFixed(6)}, ${longitude.toFixed(6)} (±${accuracy.toFixed(0)}m)`;
-                    locationInfo.classList.remove('hidden');
+                    showLocation(latitude, longitude, accuracy);
 
                     try {
                         const response = await fetch(apiUrl, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({
-                                DeviceID: deviceID,
-                                StudentName: studentName,
+                                DeviceID: appState.deviceID,
+                                StudentName: appState.studentName,
+                                Department: appState.department,
+                                Year: appState.year,
                                 Latitude: latitude,
                                 Longitude: longitude,
                                 Accuracy: accuracy,
@@ -494,54 +588,49 @@
                         });
 
                         const text = await response.text();
-
+                        
                         if (response.ok) {
                             showStatus(text || '✅ Attendance marked successfully!', 'success');
                         } else {
-                            showStatus(`Error: ${text || 'Server error'}`, 'error');
+                            showStatus(`Error: ${text}`, 'error');
                         }
                     } catch (error) {
-                        showStatus('❌ Network error. Please check your connection.', 'error');
-                        console.error('Attendance API error:', error);
+                        showStatus('❌ Network error. Check connection.', 'error');
                     } finally {
                         markAttendanceBtn.classList.remove('loading');
-                        markAttendanceBtn.innerHTML = 'Mark Attendance';
+                        markAttendanceBtn.textContent = 'Mark Attendance';
                     }
                 },
                 (error) => {
-                    let errorMsg = 'Unable to get location';
-                    switch (error.code) {
-                        case error.PERMISSION_DENIED:
-                            errorMsg = 'Location access denied. Please enable location permissions.';
-                            break;
-                        case error.POSITION_UNAVAILABLE:
-                            errorMsg = 'Location information unavailable.';
-                            break;
-                        case error.TIMEOUT:
-                            errorMsg = 'Location request timed out.';
-                            break;
-                    }
-                    showStatus(errorMsg, 'error');
+                    let msg = 'Unable to get location';
+                    if (error.code === 1) msg = 'Location access denied';
+                    else if (error.code === 3) msg = 'Location timeout';
+                    showStatus(msg, 'error');
                     markAttendanceBtn.classList.remove('loading');
-                    markAttendanceBtn.innerHTML = 'Mark Attendance';
+                    markAttendanceBtn.textContent = 'Mark Attendance';
                 },
-                { 
-                    enableHighAccuracy: true, 
-                    timeout: 15000, 
-                    maximumAge: 60000 
-                }
+                { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 }
             );
-        });
+        }
 
-        // Reset student name on double-click (for demo/testing)
-        document.addEventListener('dblclick', (e) => {
-            if (e.target.closest('.app-container')) {
-                if (confirm('Reset student name?')) {
-                    localStorage.removeItem('studentName');
-                    location.reload();
-                }
-            }
-        });
+        function showStatus(message, type) {
+            statusMessage.textContent = message;
+            statusMessage.className = `status-message ${type} show`;
+            setTimeout(clearStatus, 5000);
+        }
+
+        function clearStatus() {
+            statusMessage.classList.remove('show');
+        }
+
+        function showLocation(lat, lng, accuracy) {
+            locationDisplay.textContent = `${lat.toFixed(6)}, ${lng.toFixed(6)} (±${Math.round(accuracy)}m)`;
+            locationInfo.classList.remove('hidden');
+        }
+
+        function hideLocation() {
+            locationInfo.classList.add('hidden');
+        }
     </script>
 </body>
 </html>
