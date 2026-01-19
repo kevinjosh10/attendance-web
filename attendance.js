@@ -1,84 +1,95 @@
-document.addEventListener("DOMContentLoaded", () => {
+const apiUrl = 'https://dhtdt05ncj.execute-api.ap-south-1.amazonaws.com/prod1/attendance';
 
-    const API_URL = "https://dhtdt05ncj.execute-api.ap-south-1.amazonaws.com/prod1/attendance";
+const nameForm = document.getElementById('name-form');
+const studentNameInput = document.getElementById('student-name-input');
+const enterNameBtn = document.getElementById('enter-name-btn');
+const attendanceSection = document.getElementById('attendance-section');
+const markAttendanceBtn = document.getElementById('mark-attendance-btn');
+const timeDisplay = document.getElementById('time');
+const statusMessage = document.getElementById('status-message');
+const welcomeDisplay = document.getElementById('student-name-display');
 
-    const nameForm = document.getElementById("name-form");
-    const nameInput = document.getElementById("student-name-input");
-    const enterBtn = document.getElementById("enter-name-btn");
+let deviceID = localStorage.getItem('deviceID');
+let studentName = localStorage.getItem('studentName');
 
-    const attendanceSection = document.getElementById("attendance-section");
-    const welcomeText = document.getElementById("student-name-display");
-    const timeSpan = document.getElementById("time");
-    const markBtn = document.getElementById("mark-attendance-btn");
-    const statusMsg = document.getElementById("status-message");
+// Generate random deviceID if not exists
+if (!deviceID) {
+    deviceID = 'device-' + Math.random().toString(36).substr(2, 9);
+    localStorage.setItem('deviceID', deviceID);
+}
 
-    // Device ID
-    function getDeviceId() {
-        let id = localStorage.getItem("deviceId");
-        if (!id) {
-            id = "dev-" + Math.random().toString(36).slice(2);
-            localStorage.setItem("deviceId", id);
-        }
-        return id;
+// Update time every second
+setInterval(() => {
+    const now = new Date();
+    timeDisplay.textContent = now.toLocaleTimeString();
+}, 1000);
+
+// If studentName exists, skip name entry
+if (studentName) {
+    nameForm.style.display = 'none';
+    attendanceSection.style.display = 'block';
+    welcomeDisplay.textContent = studentName;
+}
+
+// Handle first-time name entry
+enterNameBtn.addEventListener('click', () => {
+    const name = studentNameInput.value.trim();
+    if (!name) {
+        alert('Please enter your name');
+        return;
+    }
+    studentName = name;
+    localStorage.setItem('studentName', studentName);
+    welcomeDisplay.textContent = studentName;
+    nameForm.style.display = 'none';
+    attendanceSection.style.display = 'block';
+});
+
+// Handle attendance marking
+markAttendanceBtn.addEventListener('click', () => {
+    statusMessage.textContent = 'Getting location...';
+
+    if (!navigator.geolocation) {
+        statusMessage.textContent = 'Geolocation not supported by your browser';
+        return;
     }
 
-    // Time
-    function updateTime() {
-        timeSpan.textContent = new Date().toLocaleTimeString();
-    }
-    updateTime();
-    setInterval(updateTime, 1000);
+    navigator.geolocation.getCurrentPosition(
+        async (position) => {
+            const latitude = position.coords.latitude;
+            const longitude = position.coords.longitude;
 
-    // Page load
-    const savedName = localStorage.getItem("studentName");
-    if (savedName) {
-        welcomeText.textContent = savedName;
-        nameForm.style.display = "none";
-        attendanceSection.style.display = "block";
-    }
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        DeviceID: deviceID,
+                        StudentName: studentName,
+                        Latitude: latitude,
+                        Longitude: longitude
+                    })
+                });
 
-    // Enter name
-    enterBtn.addEventListener("click", () => {
-        const name = nameInput.value.trim();
-        if (!name) {
-            alert("Please enter your name");
-            return;
-        }
-        localStorage.setItem("studentName", name);
-        welcomeText.textContent = name;
-        nameForm.style.display = "none";
-        attendanceSection.style.display = "block";
-    });
+                const text = await response.text();
 
-    nameInput.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") enterBtn.click();
-    });
-
-    // Mark attendance
-    markBtn.addEventListener("click", () => {
-        statusMsg.textContent = "Getting location...";
-        navigator.geolocation.getCurrentPosition(
-            async (pos) => {
-                const payload = {
-                    DeviceID: getDeviceId(),
-                    StudentName: localStorage.getItem("studentName"),
-                    Latitude: pos.coords.latitude,
-                    Longitude: pos.coords.longitude
-                };
-                try {
-                    const res = await fetch(API_URL, {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify(payload)
-                    });
-                    const text = await res.text();
-                    statusMsg.textContent = text;
-                } catch {
-                    statusMsg.textContent = "Error connecting to server";
+                if (response.ok) {
+                    statusMessage.textContent = text;
+                } else {
+                    statusMessage.textContent = `Error: ${text}`;
                 }
-            },
-            () => { statusMsg.textContent = "Location permission denied"; }
-        );
-    });
 
+            } catch (error) {
+                statusMessage.textContent = 'Error connecting to server';
+                console.error(error);
+            }
+        },
+        (error) => {
+            statusMessage.textContent = 'Unable to retrieve your location';
+            console.error(error);
+        },
+        { enableHighAccuracy: true, timeout: 10000 }
+    );
 });

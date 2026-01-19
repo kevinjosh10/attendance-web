@@ -3,8 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <title>Jerusalem Attendance System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background-color: #f5f5f5;
+            margin: 0;
+        }
+
+        h1 {
+            margin-bottom: 10px;
+            font-size: 2.2em;
+            text-align: center;
+            color: #1a1a1a;
+        }
+
+        h2 {
+            margin-bottom: 30px;
+            font-size: 1.8em;
+            text-align: center;
+            color: #333;
+        }
+
+        #name-form, #attendance-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        input[type="text"] {
+            padding: 12px;
+            font-size: 1.2em;
+            width: 250px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            text-align: center;
+        }
+
+        button {
+            padding: 15px 30px;
+            font-size: 1.3em;
+            border: none;
+            border-radius: 8px;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #time, #status-message {
+            font-size: 1.2em;
+            color: #444;
+        }
+    </style>
 </head>
 <body>
+    <h1>Jerusalem Attendance CSE A</h1>
     <h2 id="welcome">Welcome <span id="student-name-display"></span>!</h2>
 
     <!-- Name entry form -->
@@ -20,7 +83,6 @@
         <p id="status-message"></p>
     </div>
 
-    <!-- Correct JS reference -->
-    <script src="attendance.js"></script>
+    <script src="attendance.js" defer></script>
 </body>
 </html>
