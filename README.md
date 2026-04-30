@@ -9,6 +9,8 @@
   <img src="https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white" alt="Vite" />
 </div>
 
+![Architecture Diagram](docs/architecture.png)
+
 ## 📖 Overview
 
 The **Jerusalem Attendance System** is a modern, modular, vanilla JavaScript web application designed to track student attendance securely and accurately using the browser's Geolocation API. It features a sleek, mobile-first glassmorphic UI and integrates seamlessly with an AWS Serverless backend (Lambda + API Gateway).
